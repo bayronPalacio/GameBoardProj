@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">GameBoardProj</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="btnLogin">Login</string>
+    <string name="setmc">Please set the Main Claim</string>
+    <string name="confirm">CONFIRM</string>
+    <string name="addToGroup">Add Into One Group</string>
+    <string name="studentid">Student ID</string>
+    <string name="vote">Vote</string>
 </resources>
