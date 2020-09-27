@@ -8,4 +8,16 @@
     <string name="addToGroup">Add Into One Group</string>
     <string name="studentid">Student ID</string>
     <string name="vote">Vote</string>
+    <string name="student_title">WELCOME TO THE GAME BOARD \n DAN SMITH</string>
+    <string name="main_claim">THE MAIN CLAIM OF TODAY IS: \n\n "If a person is in fact going to do one thing, then it is not the case that they could do something else"</string>
+    <string name="vote_title">Please click a button to vote</string>
+    <string name="btn_agree">AGREE</string>
+    <string name="btn_disagree">DISAGREE</string>
+    <string name="btn_join_group">JOIN TO A GROUP</string>
+    <string name="title_join_group">Please click below to join a group</string>
+    <string name="title_rip">Please enter a Reason in Play (RIP)</string>
+    <string name="enter_message">Type a message</string>
+    <string name="example_rip">Please type a reason in play</string>
+    <string name="create_rip">Create a RIP</string>
+
 </resources>
