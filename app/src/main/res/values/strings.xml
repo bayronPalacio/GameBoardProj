@@ -20,5 +20,11 @@
     <string name="example_rip">Please type a reason in play</string>
     <string name="create_rip">Create a RIP</string>
     <string name="registraion">Don\'t have an account? Click here to register.</string>
+    <string name="firstname">First Name</string>
+    <string name="lastname">Last Name</string>
+    <string name="register">REGISTER</string>
+    <string name="loginHint">Please Login first</string>
+    <string name="registerTitle">Please Register</string>
+    <string name="mcTitle">Main Claim</string>
 
 </resources>
