@@ -5,7 +5,7 @@
     <string name="btnLogin">Login</string>
     <string name="setmc">Please set the Main Claim</string>
     <string name="confirm">CONFIRM</string>
-    <string name="addToGroup">Add Into One Group</string>
+    <string name="goBackFromVoteResult">Go Back</string>
     <string name="studentid">Student ID</string>
     <string name="vote">Vote</string>
     <string name="student_title">WELCOME TO THE GAME BOARD \n DAN SMITH</string>
@@ -26,5 +26,9 @@
     <string name="loginHint">Please Login first</string>
     <string name="registerTitle">Please Register</string>
     <string name="mcTitle">Main Claim</string>
-
+    <string name="checkVote">Check the vote results</string>
+    <string name="startScrimmage">Start Bout of Logical Scrimmage</string>
+    <string name="timer">3:00</string>
+    <string name="endScrimmage">End Bout of Logical Scrimmage</string>
+    <string name="haveAccount">Already have an account? Click here to Login</string>
 </resources>

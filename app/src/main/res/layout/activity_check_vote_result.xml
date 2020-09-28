@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/backgroundColor"
     tools:context=".splitGroups">
 
     <LinearLayout
@@ -47,7 +48,7 @@
         android:id="@+id/addToGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/addToGroup"
+        android:text="@string/goBackFromVoteResult"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
