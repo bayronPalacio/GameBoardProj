@@ -19,5 +19,6 @@
     <string name="enter_message">Type a message</string>
     <string name="example_rip">Please type a reason in play</string>
     <string name="create_rip">Create a RIP</string>
+    <string name="registraion">Don\'t have an account? Click here to register.</string>
 
 </resources>

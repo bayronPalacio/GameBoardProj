@@ -9,7 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".group"></activity>
+        <activity android:name=".RegistrationActivity"></activity>
+        <activity android:name=".group" />
         <activity android:name=".student_main" />
         <activity android:name=".splitGroups" />
         <activity android:name=".setMCActivity" />
