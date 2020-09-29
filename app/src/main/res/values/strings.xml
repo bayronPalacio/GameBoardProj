@@ -31,4 +31,6 @@
     <string name="timer">3:00</string>
     <string name="endScrimmage">End Bout of Logical Scrimmage</string>
     <string name="haveAccount">Already have an account? Click here to Login</string>
+    <string name="rip">RIP</string>
+    <string name="selectRip">SELECT THIS RIP</string>
 </resources>
