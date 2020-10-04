@@ -23,17 +23,17 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_login)
 
         loginBtn.setOnClickListener {
-
                 Observable.fromCallable {
                     dataBaseGame = GameDatabase.getAppDataBase(context = this)
                     studentDao = dataBaseGame?.studentDao()
 
                     with(studentDao) {
-                        studentInfo = this?.getStudentByEmail(username.text.toString())!!
+                        studentInfo = this?.getStudentByEmail(inputEmail = username.text.toString())!!
                     }
                 }.subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe()
+            Thread.sleep(300)
             if(studentInfo?.emailDb.toString() == username.text.toString() && studentInfo?.passwordDb.toString() == password.text.toString() )
             {
                 Toast.makeText(this,"User Name\n" + studentInfo?.firstNameDb.toString() + " " + studentInfo?.lastNameDb.toString(),Toast.LENGTH_LONG).show()
