@@ -18,6 +18,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity"/>
+        <activity android:name=".LeaderMain"/>
+        <activity android:name=".UserMain"/>
     </application>
 
 </manifest>

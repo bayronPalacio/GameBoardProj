@@ -14,10 +14,10 @@ interface StudentDao {
     @Delete
     fun deleteStudent(student: Student)
 
-    @Query("SELECT * FROM student_table")
+    @Query("SELECT * FROM user")
     fun getAllStudents():List<Student>
 
-    @Query("SELECT * FROM student_table WHERE emailDb ==:inputEmail")
+    @Query("SELECT * FROM user WHERE emailDb ==:inputEmail")
     fun getStudentByEmail(inputEmail: String):Student
 
 }

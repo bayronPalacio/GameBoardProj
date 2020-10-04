@@ -5,11 +5,12 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "student_table")
+@Entity(tableName = "user")
 class Student (
-    @PrimaryKey(autoGenerate = true) val studentIdDb: Int?=null,
+    @PrimaryKey(autoGenerate = true) val userIdDb: Int?=null,
     val firstNameDb: String?,
     val lastNameDb: String?,
     val emailDb: String?,
-    val passwordDb: String?
+    val passwordDb: String?,
+    val roleTypeDb: Int?,
 )

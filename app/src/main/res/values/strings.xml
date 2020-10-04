@@ -33,4 +33,7 @@
     <string name="haveAccount">Already have an account? Click here to Login</string>
     <string name="rip">RIP</string>
     <string name="selectRip">SELECT THIS RIP</string>
+    <string name="leaderRole">Leader</string>
+    <string name="playerRole">Player</string>
+
 </resources>
