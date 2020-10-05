@@ -12,7 +12,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "main_claim_table")
 data class MainClaim(
     @PrimaryKey(autoGenerate = true)
-    var mc_id: Int,
+    var mc_id: Int? = null,
 
     var mc_statement: String?,
     var mc_votes: Int,

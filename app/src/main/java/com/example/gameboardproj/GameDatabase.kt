@@ -4,12 +4,14 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.gameboardproj.data.MainClaim
 
 
-@Database(entities = [Student::class], version = 1)
+@Database(entities = [Student::class,MainClaim::class], version = 1)
 abstract class GameDatabase : RoomDatabase() {
 
     abstract fun studentDao() : StudentDao
+    abstract fun mainclaimDao() : MainClaimDao
 
     companion object {
         var INSTANCE: GameDatabase? = null
