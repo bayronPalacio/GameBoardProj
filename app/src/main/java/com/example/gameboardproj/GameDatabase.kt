@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import com.example.gameboardproj.data.MainClaim
 
 
-@Database(entities = [Student::class,MainClaim::class], version = 1)
+@Database(entities = [Student::class,MainClaim::class], version = 2)
 abstract class GameDatabase : RoomDatabase() {
 
     abstract fun studentDao() : StudentDao
@@ -19,7 +19,8 @@ abstract class GameDatabase : RoomDatabase() {
         fun getAppDataBase(context: Context): GameDatabase? {
             if (INSTANCE == null){
                 synchronized(GameDatabase::class){
-                    INSTANCE = Room.databaseBuilder(context.applicationContext, GameDatabase::class.java, "Database").build()
+                    INSTANCE = Room.databaseBuilder(context.applicationContext, GameDatabase::class.java, "Database")
+                        .fallbackToDestructiveMigration().build()
                 }
             }
             return INSTANCE

@@ -27,7 +27,7 @@ class LeaderMain : AppCompatActivity() {
                     dataBaseGame = GameDatabase.getAppDataBase(context = this)
                     mainclaimDao = dataBaseGame?.mainclaimDao()
 
-                    var mainClaim = MainClaim(mc_statement = setMCEditText.text.toString(),mc_votes = 0,mc_professor_id = 1)
+                    var mainClaim = MainClaim(mc_id = 1, mc_statement = setMCEditText.text.toString(),mc_votes = 0,mc_professor_id = 1)
 
                     with(mainclaimDao) {
                         this?.insertMainClaim(mainClaim)
@@ -35,6 +35,7 @@ class LeaderMain : AppCompatActivity() {
                 }.subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe()
+                Toast.makeText(this,"A new main claim has been created",Toast.LENGTH_LONG).show()
             }
         }
     }
