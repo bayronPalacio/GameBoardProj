@@ -14,6 +14,12 @@ import kotlinx.android.synthetic.main.activity_registration.*
 import kotlinx.android.synthetic.main.activity_registration.password
 import kotlinx.android.synthetic.main.activity_registration.register
 
+/**
+ * @author: Bayron Arturo Palacio
+ *
+ * This class will create a new user with the data entered by the user and add it to the Database.
+ *
+ */
 
 class RegistrationActivity : AppCompatActivity() {
 
@@ -31,7 +37,9 @@ class RegistrationActivity : AppCompatActivity() {
         val sharedPreferences : SharedPreferences = this.getSharedPreferences(sharedPrefFile, Context.MODE_PRIVATE)
         val editor : SharedPreferences.Editor =  sharedPreferences.edit()
 
+        //When the user clicks the Register Button:
         register.setOnClickListener {
+            //The fields are check to make sure that are not empty. If they are empty, a toast will be shown
             if(firstName.text.toString() == "" || lastName.text.toString() == "" || email.text.toString() == "" || password.text.toString() == "" || radioGroupRole.checkedRadioButtonId == -1){
                 if(radioGroupRole.checkedRadioButtonId == -1){
                     Toast.makeText(this,"Please select a role",Toast.LENGTH_LONG).show()
@@ -40,6 +48,7 @@ class RegistrationActivity : AppCompatActivity() {
                     Toast.makeText(this,"Please enter information",Toast.LENGTH_LONG).show()
                 }
             }
+            //If the fields are not empty
             else{
                 // add info to SharedPreferences - user fName, lName
                 editor.putString("user_firstName", firstName.text.toString())
@@ -54,18 +63,24 @@ class RegistrationActivity : AppCompatActivity() {
                     0 // Zero will be assigned for the leader user
                 }
                 Observable.fromCallable {
+
+                    //An instance of the Database and studenDao are created
                     dataBaseGame = GameDatabase.getAppDataBase(context = this)
                     studentDao = dataBaseGame?.studentDao()
 
+                    //An Student object is created with the information entered by the user
                     var student1 = Student(firstNameDb = firstName.text.toString(), lastNameDb = lastName.text.toString(), emailDb = email.text.toString(), passwordDb = password.text.toString(),roleTypeDb = role)
 
                     with(studentDao) {
+                        //The student object is added to the database through the studentDao with the insertStudent() method
                         this?.insertStudent(student1)
                     }
                 }.subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe()
+                //Message to show the new user has been created
                 Toast.makeText(this,"A new user has been created",Toast.LENGTH_LONG).show()
+                //Launch the Login Activity
                 val toLogin = Intent(this,LoginActivity::class.java)
                 startActivity(toLogin)
             }

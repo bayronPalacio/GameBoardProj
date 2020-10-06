@@ -8,6 +8,13 @@ import com.example.gameboardproj.data.MainClaim
 import com.example.gameboardproj.data.ReasonInPlay
 import com.example.gameboardproj.data.ReasonInPlayDao
 
+/**
+ * @author: Bayron Arturo Palacio
+ *
+ * This abstract class extends the RoomDatabase and holds a connection with the SQLite database.
+ * Reference: https://medium.com/mindorks/room-kotlin-android-architecture-components-71cad5a1bb35
+ *
+ */
 
 @Database(entities = [Student::class,MainClaim::class, ReasonInPlay::class], version = 3)
 abstract class GameDatabase : RoomDatabase() {
