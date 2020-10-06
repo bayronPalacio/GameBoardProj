@@ -35,5 +35,6 @@
     <string name="selectRip">SELECT THIS RIP</string>
     <string name="leaderRole">Leader</string>
     <string name="playerRole">Player</string>
+    <string name="update_rip">update RiP</string>
 
 </resources>

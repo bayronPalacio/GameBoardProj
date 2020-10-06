@@ -6,6 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
+/**
+ * @author Daniel Cooper
+ *
+ * Left Board Game half - used by GameBoardActivity
+ */
 class LeftBoardFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

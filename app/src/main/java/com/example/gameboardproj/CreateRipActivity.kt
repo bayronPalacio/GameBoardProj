@@ -12,8 +12,17 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_group.*
+import kotlinx.android.synthetic.main.rip_result.*
 
-// Dan - Oct 5
+/**
+ * @author Daniel Cooper
+ *
+ * Allows for the creation and modification of RiP's
+ *
+ * has a listener for two buttons that update or create RiPs
+ * after RiP creation will navigate to the game board
+ *
+ */
 
 class CreateRipActivity : AppCompatActivity() {
 
@@ -22,13 +31,15 @@ class CreateRipActivity : AppCompatActivity() {
     private var ripDao: ReasonInPlayDao? = null
 
     private val sharedPrefFile = "sharedPref"
+    private var ripStatement = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_group)
 
         // Shared Preferences, user data needed to implement RiP
-        val sharedPreferences : SharedPreferences = this.getSharedPreferences(sharedPrefFile, Context.MODE_PRIVATE)
+        val sharedPreferences: SharedPreferences =
+            this.getSharedPreferences(sharedPrefFile, Context.MODE_PRIVATE)
         var userFirstName = sharedPreferences.getString("user_firstName", "not found")
         var userLastName = sharedPreferences.getString("user_lastName", "not found")
         // var currentMC =    will need to access MC
@@ -57,6 +68,7 @@ class CreateRipActivity : AppCompatActivity() {
                     .subscribe()
 
                 Toast.makeText(this, "RiP has been added to the Database", Toast.LENGTH_LONG).show()
+                ripStatement = create_rip.text.toString()
 
                 // Move activity to Game Board
                 //val toGameBoard = Intent(this, GameBoardActivity::class.java)
@@ -65,6 +77,20 @@ class CreateRipActivity : AppCompatActivity() {
                 Toast.makeText(this, "Please enter your Reason in Play", Toast.LENGTH_LONG).show()
             }
 
+        }
+
+        // User wants to Update RiP
+        update_rip.setOnClickListener {
+            Observable.fromCallable {
+                ripDao = dataBaseGame?.ripDao()
+
+                //  change RiP statement and update
+                if (ripStatement != "") {
+                    val rip: ReasonInPlay = ripDao!!.getRipByStatement(ripStatement)
+                    rip.rip_statement = ripStatement
+                    ripDao?.updateRip(rip)
+                }
+            }
         }
     }
 }

@@ -1,5 +1,13 @@
 package com.example.gameboardproj
 
+/**
+ * @author Daniel Cooper
+ *
+ * A design for a vote tally upon the end of the game
+ * Using card layout for each user...
+ * display the final votes on MC, display the RiP that changed a users mind if switched (let user know they persuaded someone without scoring system)
+ */
+
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater

@@ -4,6 +4,14 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import kotlinx.android.synthetic.main.activity_game_board.*
 
+/**
+ * @author Daniel Cooper
+ *
+ * The main Game Board Activity
+ *
+ * will allow the user to vote on the MC then depending on their vote open a fragment
+ * for the corresponding half of the gameboard.
+ */
 class GameBoardActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

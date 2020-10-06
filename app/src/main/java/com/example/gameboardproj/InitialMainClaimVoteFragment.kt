@@ -1,5 +1,14 @@
 package com.example.gameboardproj
 
+/**
+ * @author Daniel Cooper
+ *
+ * A design for for a vote tally upon the end of the game
+ *
+ * Using card layout for each user...
+ * display the original votes on MC, then move to Final MC Vote fragment
+ */
+
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater

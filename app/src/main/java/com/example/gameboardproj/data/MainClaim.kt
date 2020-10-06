@@ -3,11 +3,12 @@ package com.example.gameboardproj.data
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-// Dan - Oct 3
-// Link for Annotations
-// https://developer.android.com/training/data-storage/room/defining-data.html#kotlin
-// Link for example
-// https://codelabs.developers.google.com/codelabs/android-room-with-a-view-kotlin/#4
+/**
+ * @author Daniel Cooper
+ * The Main Claim Entity Table
+ *
+ * store a unique MC ID, the statement, true or false votes, and the MC creator (the professor)
+ */
 
 @Entity(tableName = "main_claim_table")
 data class MainClaim(

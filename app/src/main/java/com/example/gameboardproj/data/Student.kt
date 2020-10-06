@@ -4,7 +4,8 @@ package com.example.gameboardproj.data
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-// Dan - Oct 3
+// Dan
+// Student entity Table
 
 @Entity(tableName = "student_table")
 data class Student (

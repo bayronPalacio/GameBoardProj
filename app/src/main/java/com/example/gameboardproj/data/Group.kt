@@ -5,8 +5,10 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
-// Dan - Oct 3
 
+/**
+ * Used to house groups for play
+ */
 @Entity(tableName = "group_table")
 data class Group (
     @PrimaryKey(autoGenerate = true)

@@ -4,11 +4,15 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
-// Dan - Oct 3
-// Link for Annotations
-// https://developer.android.com/training/data-storage/room/defining-data.html#kotlin
-// Link for example
-// https://codelabs.developers.google.com/codelabs/android-room-with-a-view-kotlin/#4
+/**
+ * @author Daniel Cooper
+ * Create the Reason in Play Entity Table
+ *
+ * rip_id = a unique key to identify the RiP
+ * rip_statement - the statement created by a user
+ * rip_vote - votes made by students on the Rip
+ * mc_id - links the RiP to the Main Claim's unique ID
+ */
 
 @Entity(tableName = "rip_table")
 data class ReasonInPlay(
