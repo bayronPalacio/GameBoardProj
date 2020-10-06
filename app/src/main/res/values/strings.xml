@@ -6,7 +6,7 @@
     <string name="setmc">Please set the Main Claim</string>
     <string name="confirm">CONFIRM</string>
     <string name="goBackFromVoteResult">Go Back</string>
-    <string name="studentid">Student ID</string>
+    <string name="userid">User ID</string>
     <string name="vote">Vote</string>
     <string name="student_title">WELCOME TO THE GAME BOARD \n DAN SMITH</string>
     <string name="main_claim">THE MAIN CLAIM OF TODAY IS: \n\n "If a person is in fact going to do one thing, then it is not the case that they could do something else"</string>

@@ -18,12 +18,12 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/studentidTitle"
+            android:id="@+id/usertidTitle"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="@string/studentid" />
+            android:text="@string/userid" />
 
         <TextView
             android:id="@+id/voteTitle"
