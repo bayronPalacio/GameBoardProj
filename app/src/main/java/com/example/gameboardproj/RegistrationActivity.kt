@@ -20,6 +20,8 @@ class RegistrationActivity : AppCompatActivity() {
     private var dataBaseGame: GameDatabase? = null
     private var studentDao: StudentDao? = null
     private var role : Int = -1
+
+    // Shared Preferences file name
     private val sharedPrefFile = "sharedPref"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,7 +41,7 @@ class RegistrationActivity : AppCompatActivity() {
                 }
             }
             else{
-                // add info to SharedPreferences
+                // add info to SharedPreferences - user fName, lName
                 editor.putString("user_firstName", firstName.text.toString())
                 editor.putString("user_lastName", lastName.text.toString())
                 editor.apply()

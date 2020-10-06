@@ -18,6 +18,7 @@ class LoginActivity : AppCompatActivity() {
     private var dataBaseGame: GameDatabase? = null
     private var studentDao: StudentDao? = null
     private var studentInfo : Student? = null
+
     private val sharedPrefFile = "sharedPref"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,9 +41,11 @@ class LoginActivity : AppCompatActivity() {
             {
                 Toast.makeText(this,"User Name\n" + studentInfo?.firstNameDb.toString() + " " + studentInfo?.lastNameDb.toString(),Toast.LENGTH_LONG).show()
 
+                // Shared Preferences
                 val sharedPreferences : SharedPreferences = this.getSharedPreferences(sharedPrefFile, Context.MODE_PRIVATE)
                 val editor : SharedPreferences.Editor =  sharedPreferences.edit()
 
+                // Store the current user email
                 editor.putString("user_email", username.text.toString())
                 editor.apply()
                 editor.commit()
