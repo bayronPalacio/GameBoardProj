@@ -24,6 +24,7 @@ import kotlinx.android.synthetic.main.activity_login.register
 
 class LoginActivity : AppCompatActivity() {
 
+
     private var dataBaseGame: GameDatabase? = null
     private var studentDao: StudentDao? = null
     private var studentInfo : Student? = null

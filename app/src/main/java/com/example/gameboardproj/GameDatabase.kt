@@ -19,6 +19,7 @@ import com.example.gameboardproj.data.ReasonInPlayDao
 @Database(entities = [Student::class,MainClaim::class, ReasonInPlay::class], version = 3)
 abstract class GameDatabase : RoomDatabase() {
 
+
     abstract fun studentDao() : StudentDao
     abstract fun mainclaimDao() : MainClaimDao
     abstract fun ripDao() : ReasonInPlayDao

@@ -19,9 +19,11 @@ import kotlinx.android.synthetic.main.activity_registration.register
  *
  * This class will create a new user with the data entered by the user and add it to the Database.
  *
+ *
  */
 
 class RegistrationActivity : AppCompatActivity() {
+
 
     private var dataBaseGame: GameDatabase? = null
     private var studentDao: StudentDao? = null

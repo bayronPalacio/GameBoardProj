@@ -26,4 +26,5 @@ class Student (
     val emailDb: String?,
     val passwordDb: String?,
     val roleTypeDb: Int?,
+
 )

@@ -31,4 +31,5 @@ interface StudentDao {
     @Query("SELECT * FROM user WHERE emailDb ==:inputEmail")
     fun getStudentByEmail(inputEmail: String):Student
 
+
 }
