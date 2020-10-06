@@ -13,7 +13,6 @@ import androidx.room.PrimaryKey
 data class MainClaim(
     @PrimaryKey(autoGenerate = true)
     var mc_id: Int,
-
     var mc_statement: String?,
     var mc_votes: Int,
     var mc_professor_id: Int
