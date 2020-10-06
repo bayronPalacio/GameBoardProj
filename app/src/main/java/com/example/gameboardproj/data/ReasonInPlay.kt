@@ -13,14 +13,14 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "rip_table")
 data class ReasonInPlay(
     @PrimaryKey(autoGenerate = true)
-    var rip_id: Int,
+    val rip_id: Int? = null,
 
     var rip_statement: String?,
     var rip_submitted_by: String?,
     var rip_vote: Int,
 
     // NOT SURE IF THIS IS CORRECT ?????
-    @ForeignKey(entity = MainClaim::class,  // confusing naming?
+    @ForeignKey(entity = MainClaim::class,
                 parentColumns = ["mc_id"],  // mc table column
                 childColumns = ["mc_id"])   // rip table column
     var mc_id: Int

@@ -6,26 +6,30 @@
     android:layout_height="match_parent"
     android:background="@color/backgroundColor"
     android:orientation="vertical"
-    tools:context=".group">
+    tools:context=".CreateRipActivity">
 
     <TextView
         android:id="@+id/title_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
         android:gravity="center"
         android:text="@string/title_rip"
         android:textColor="@color/titleColor"
         android:textSize="24sp"
         android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/textView"
+    <EditText
+        android:id="@+id/ripInputText"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:layout_marginTop="50dp"
+        android:ems="10"
         android:background="@color/design_default_color_background"
-        android:text="@string/example_rip" />
+        android:gravity="start|top"
+        android:inputType="textMultiLine"
+        android:hint="@string/example_rip" />
+
 
     <Button
         android:id="@+id/create_rip"

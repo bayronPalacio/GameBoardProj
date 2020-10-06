@@ -20,6 +20,7 @@
         <activity android:name=".MainActivity"/>
         <activity android:name=".LeaderMain"/>
         <activity android:name=".UserMain"/>
+        <activity android:name=".CreateRipActivity"/>
     </application>
 
 </manifest>
