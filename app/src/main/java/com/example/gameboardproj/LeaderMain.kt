@@ -10,6 +10,10 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_leader_main.*
 import kotlinx.android.synthetic.main.activity_registration.*
 
+/*
+Author: Haonan Cao
+Purpose: put main claim into mainclaim table, update database
+ */
 class LeaderMain : AppCompatActivity() {
 
     private var dataBaseGame: GameDatabase? = null

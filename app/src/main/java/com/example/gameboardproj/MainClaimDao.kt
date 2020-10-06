@@ -3,6 +3,10 @@ package com.example.gameboardproj
 import androidx.room.*
 import com.example.gameboardproj.data.MainClaim
 
+/*
+Author: Haonan Cao
+Purpose: mainclaim table queries
+ */
 @Dao
 interface MainClaimDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)

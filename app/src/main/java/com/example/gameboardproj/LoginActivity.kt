@@ -63,7 +63,6 @@ class LoginActivity : AppCompatActivity() {
             else{
                 Toast.makeText(this,"Please enter a valid username and password",Toast.LENGTH_LONG).show()
             }
-
         }
 
 
