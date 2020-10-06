@@ -1,5 +1,6 @@
 package com.example.gameboardproj
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -41,6 +42,11 @@ class LeaderMain : AppCompatActivity() {
                     .subscribe()
                 Toast.makeText(this,"A new main claim has been created",Toast.LENGTH_LONG).show()
             }
+        }
+
+        checkVote.setOnClickListener{
+            //val toCheckVote = Intent(this,CheckVoteResults::class.java)
+            //startActivity(toCheckVote)
         }
     }
 }
