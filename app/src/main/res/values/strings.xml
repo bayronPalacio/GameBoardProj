@@ -36,5 +36,7 @@
     <string name="leaderRole">Leader</string>
     <string name="playerRole">Player</string>
     <string name="update_rip">update RiP</string>
+    <string name="studentid">Student ID</string>
+
 
 </resources>
