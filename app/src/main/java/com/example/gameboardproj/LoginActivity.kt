@@ -59,7 +59,7 @@ class LoginActivity : AppCompatActivity() {
                         }
                         else if(response["responseLogin"].toString().equals("Right User")){
                             Toast.makeText(this, "Welcome " + response["name"] + " " + response["last"], Toast.LENGTH_LONG).show()
-                            val toLogin = Intent(this,LoginActivity::class.java)
+                            val toLogin = Intent(this,LeaderMain::class.java)
                             startActivity(toLogin)
                         }
                         else if(response["responseLogin"].toString().equals("User does not exist")){
