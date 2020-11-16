@@ -8,11 +8,19 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.gameboardproj.data.ReasonInPlay
 import com.example.gameboardproj.data.ReasonInPlayDao
+import com.google.gson.JsonObject
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_group.*
-import kotlinx.android.synthetic.main.rip_result.*
+import java.io.BufferedReader
+
+import org.json.JSONObject
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
+import kotlinx.android.synthetic.main.activity_leader_main.*
 
 /**
  * @author Daniel Cooper
@@ -21,6 +29,8 @@ import kotlinx.android.synthetic.main.rip_result.*
  *
  * has a listener for two buttons that update or create RiPs
  * after RiP creation will navigate to the game board
+ *
+ * Must find current user, current RiP, and current MC on activity start
  *
  */
 
@@ -37,17 +47,58 @@ class CreateRipActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_group)
 
+        // Access text file query Server
+        var fileReader: BufferedReader = application.assets.open("url.txt").bufferedReader()
+        var url = fileReader.readLine()
+
+
         // Shared Preferences, user data needed to implement RiP
-        val sharedPreferences: SharedPreferences =
-            this.getSharedPreferences(sharedPrefFile, Context.MODE_PRIVATE)
-        var userFirstName = sharedPreferences.getString("user_firstName", "not found")
-        var userLastName = sharedPreferences.getString("user_lastName", "not found")
+        //val sharedPreferences: SharedPreferences = this.getSharedPreferences(sharedPrefFile, Context.MODE_PRIVATE)
+        //var userFirstName = sharedPreferences.getString("user_firstName", "not found")
+        //var userLastName = sharedPreferences.getString("user_lastName", "not found")
         // var currentMC =    will need to access MC
 
-        // RiP Creation onClicklistener
+
         create_rip.setOnClickListener {
-            // Toast for if input was empty
-            if (ripInputText.text.toString() != null) {
+            // If ReasonInPlay Input has text
+            if (ripInputText.text.trim().toString() != null) {
+
+                // The associated URL path to Server
+                var urlPath = "$url/createRip"
+
+                val reasonInPlay = JSONObject()
+
+                // Follows format - RIP_TABLE (RIP_ID, RIP_STATEMENT ,RIP_SUBMITTED_BY, RIP_VOTE, MC_ID)
+                // unique ID is pre-generated
+                reasonInPlay.put("ripStatement", ripInputText.text.toString())
+                reasonInPlay.put("ripSubmittedBy", ripInputText.text.toString())
+                // reasonInPlay.put("ripVote", ripInputText.text.toString())
+                // reasonInPlay.put("ripAssociatedMainClaim", ripInputText.text.toString())
+
+                //
+                val requestQueue = Volley.newRequestQueue(this)
+                val createRequest = JsonObjectRequest(
+                    Request.Method.POST,    // How
+                    urlPath,                // Where
+                    reasonInPlay,           // What
+                    Response.Listener { response ->
+                        if(response["responseServer"].toString().equals("Yes")){
+                            Toast.makeText(this, "RiP has been created", Toast.LENGTH_SHORT).show()
+                        }
+                        else{
+                            Toast.makeText(this, "RiP already exits", Toast.LENGTH_SHORT).show()
+                        }
+                        println("Response from server -> " + response["responseServer"])
+                    },
+                    Response.ErrorListener {
+                        println("Error from server")
+                    }
+                )
+                // put query into request queue and perform
+                requestQueue.add(createRequest)
+                // asdfasd
+                /*
+                * From Room DB
                 Observable.fromCallable {
                     ripDao = dataBaseGame?.ripDao()
 
@@ -73,14 +124,25 @@ class CreateRipActivity : AppCompatActivity() {
                 // Move activity to Game Board
                 //val toGameBoard = Intent(this, GameBoardActivity::class.java)
                 //startActivity(toGameBoard)
+
+                 */
             } else {
                 Toast.makeText(this, "Please enter your Reason in Play", Toast.LENGTH_LONG).show()
             }
 
         }
 
-        // User wants to Update RiP
+        // Update RiP
+        // TextBox will contain the current RiP on Start
+        // Make Modification to Text, then Update
+        // Check that current RiP ID exists, suggest Add
+        // If ID exist - change statement
         update_rip.setOnClickListener {
+
+            // The associated URL path to Server
+            var urlPath = "$url/createRip"
+
+
             Observable.fromCallable {
                 ripDao = dataBaseGame?.ripDao()
 
