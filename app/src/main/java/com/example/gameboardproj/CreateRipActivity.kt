@@ -75,17 +75,15 @@ class CreateRipActivity : AppCompatActivity() {
                 // reasonInPlay.put("ripVote", ripInputText.text.toString())
                 // reasonInPlay.put("ripAssociatedMainClaim", ripInputText.text.toString())
 
-                //
                 val requestQueue = Volley.newRequestQueue(this)
                 val createRequest = JsonObjectRequest(
                     Request.Method.POST,    // How
                     urlPath,                // Where
                     reasonInPlay,           // What
                     Response.Listener { response ->
-                        if(response["responseServer"].toString().equals("Yes")){
+                        if (response["responseServer"].toString().equals("Yes")) {
                             Toast.makeText(this, "RiP has been created", Toast.LENGTH_SHORT).show()
-                        }
-                        else{
+                        } else {
                             Toast.makeText(this, "RiP already exits", Toast.LENGTH_SHORT).show()
                         }
                         println("Response from server -> " + response["responseServer"])
@@ -96,40 +94,9 @@ class CreateRipActivity : AppCompatActivity() {
                 )
                 // put query into request queue and perform
                 requestQueue.add(createRequest)
-                // asdfasd
-                /*
-                * From Room DB
-                Observable.fromCallable {
-                    ripDao = dataBaseGame?.ripDao()
-
-                    // Create RiP statement
-                    var ripStatement = ReasonInPlay(
-                        rip_statement = create_rip.text.toString(), // text from input
-                        rip_submitted_by = "$userFirstName $userLastName", // submitted by will display a full name
-                        rip_vote = -1,   // set to -1 by default - 0 or 1 for true false - updated later
-                        mc_id = 1   // need to get current mc - currently dummy var
-                    )
-
-                    // insert to DB
-                    with(ripDao) {
-                        this?.insertRip(ripStatement)
-                    }
-                }.subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe()
-
-                Toast.makeText(this, "RiP has been added to the Database", Toast.LENGTH_LONG).show()
-                ripStatement = create_rip.text.toString()
-
-                // Move activity to Game Board
-                //val toGameBoard = Intent(this, GameBoardActivity::class.java)
-                //startActivity(toGameBoard)
-
-                 */
             } else {
                 Toast.makeText(this, "Please enter your Reason in Play", Toast.LENGTH_LONG).show()
             }
-
         }
 
         // Update RiP
@@ -139,20 +106,67 @@ class CreateRipActivity : AppCompatActivity() {
         // If ID exist - change statement
         update_rip.setOnClickListener {
 
-            // The associated URL path to Server
-            var urlPath = "$url/createRip"
+            if (ripInputText.text.trim().toString() != null) {
+
+                // The associated URL path to Server
+                var urlPath = "$url/createRip"
+
+                val reasonInPlay = JSONObject()
+
+                reasonInPlay.get("ripID")
 
 
-            Observable.fromCallable {
-                ripDao = dataBaseGame?.ripDao()
 
-                //  change RiP statement and update
-                if (ripStatement != "") {
-                    val rip: ReasonInPlay = ripDao!!.getRipByStatement(ripStatement)
-                    rip.rip_statement = ripStatement
-                    ripDao?.updateRip(rip)
+
+                /*
+                Observable.fromCallable {
+                    ripDao = dataBaseGame?.ripDao()
+
+                    //  change RiP statement and update
+                    if (ripStatement != "") {
+                        val rip: ReasonInPlay = ripDao!!.getRipByStatement(ripStatement)
+                        rip.rip_statement = ripStatement
+                        ripDao?.updateRip(rip)
+                    }
                 }
+                 */
+            }
+
+            fun GetCurrentUser(){
+
             }
         }
+
+
+        /*
+
+        * From Room DB
+        Observable.fromCallable {
+            ripDao = dataBaseGame?.ripDao()
+
+            // Create RiP statement
+            var ripStatement = ReasonInPlay(
+                rip_statement = create_rip.text.toString(), // text from input
+                rip_submitted_by = "$userFirstName $userLastName", // submitted by will display a full name
+                rip_vote = -1,   // set to -1 by default - 0 or 1 for true false - updated later
+                mc_id = 1   // need to get current mc - currently dummy var
+            )
+
+            // insert to DB
+            with(ripDao) {
+                this?.insertRip(ripStatement)
+            }
+        }.subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe()
+
+        Toast.makeText(this, "RiP has been added to the Database", Toast.LENGTH_LONG).show()
+        ripStatement = create_rip.text.toString()
+
+        // Move activity to Game Board
+        //val toGameBoard = Intent(this, GameBoardActivity::class.java)
+        //startActivity(toGameBoard)
+
+         */
     }
 }
