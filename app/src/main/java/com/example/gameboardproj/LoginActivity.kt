@@ -30,11 +30,13 @@ class LoginActivity : AppCompatActivity() {
     private var studentDao: StudentDao? = null
     private var studentInfo : Student? = null
 
-    private val sharedPrefFile = "sharedPref"
+    private var sharedPrefFile : SharedPreferences? = null;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+
+        sharedPrefFile = this.getSharedPreferences("sharedPreferences", 0);
 
         var fileReader: BufferedReader = application.assets.open("url.txt").bufferedReader()
         var url = fileReader.readLine()
@@ -59,6 +61,9 @@ class LoginActivity : AppCompatActivity() {
                         }
                         else if(response["responseLogin"].toString().equals("Right User")){
                             Toast.makeText(this, "Welcome " + response["name"] + " " + response["last"], Toast.LENGTH_LONG).show()
+                           // val editor = sharedPrefFile!!.edit()
+                            //editor.putInt("userID", response["_id"] as Int)
+                            //editor.apply()
                             if(response["role"].toString().equals("0")){
                                 val toLogin = Intent(this,LeaderMain::class.java)
                                 startActivity(toLogin)
@@ -73,6 +78,9 @@ class LoginActivity : AppCompatActivity() {
                     }
                 )
                 que.add(req)
+
+                val login = Intent(this, CreateRipActivity::class.java)
+                startActivity(login)
             }
         }
 

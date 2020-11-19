@@ -20,15 +20,20 @@
         android:textSize="24sp"
         android:textStyle="bold" />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/ripRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="150dp" />
+
     <EditText
         android:id="@+id/ripInputText"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:ems="10"
+        android:layout_height="100dp"
         android:background="@color/design_default_color_background"
+        android:ems="10"
         android:gravity="start|top"
-        android:inputType="textMultiLine"
-        android:hint="@string/example_rip" />
+        android:hint="@string/example_rip"
+        android:inputType="textMultiLine" />
 
 
     <Button
