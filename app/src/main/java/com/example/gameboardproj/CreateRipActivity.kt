@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -73,6 +74,12 @@ class CreateRipActivity : AppCompatActivity() {
         var listOfRips = ArrayList<RiP>()
         getRips(url, listOfRips)
 
+
+        Log.d("testing", listOfRips.toString())
+        for(entity in listOfRips ){
+            Log.d("testing", listOfRips.toString())
+            Log.d("testing", entity.toString())
+        }
         var array = emptyArray<RiP>()
 
         layoutManager = LinearLayoutManager(this)
@@ -181,11 +188,16 @@ class CreateRipActivity : AppCompatActivity() {
                     val vote = rip.getInt("rip_vote")
                     val forMC = rip.getInt("rip_mc_id")
                     val ripObject: RiP = RiP(id, statement, submittedBy, vote, forMC)
+
+                    Log.d("testing", ripObject.toString())
                     listOfRips.add(ripObject)
                 }
+
+
+
             },
             Response.ErrorListener {
-                println("Error from server")
+                println(it.toString())
             }
         )
         // put query into request queue and perform
@@ -218,7 +230,12 @@ class MyAdapter(private val dataSet : Array<RiP>):
 }
 
 // Follows format - RIP_TABLE (RIP_ID, RIP_STATEMENT ,RIP_SUBMITTED_BY, RIP_VOTE, MC_ID)
-data class RiP(val ripID : String, val ripStatement : String, val ripSubmittedBy : Int, val ripVote : Int, val ripMainClaimID : Int)
+data class RiP constructor(val ripID : String, val ripStatement : String, val ripSubmittedBy : Int, val ripVote : Int, val ripMainClaimID : Int){
+
+    override fun toString(): String {
+        return "RiP(ripID='$ripID', ripStatement='$ripStatement', ripSubmittedBy=$ripSubmittedBy, ripVote=$ripVote, ripMainClaimID=$ripMainClaimID)"
+    }
+}
 
 
 
