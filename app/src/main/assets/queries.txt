@@ -1,0 +1,160 @@
+// This is missing lines 1-10 of our python file...
+// didn't want to include our key's etc if its on Git
+
+db = client.GameBoardProject
+
+@app.route('/')
+def start():
+    return '<h1>GAME BOARD PROJECT</h1>'
+
+@app.route('/team',methods=['GET'])
+def student_name():
+    team = '<h1>Team Members</h1>'
+    team += '<h2>Bayron Arturo Palacio</h2>'
+    return team
+
+@app.route('/data',methods=['GET'])
+def display_data():
+    if os.path.exists('customer.json'):
+        with open('customer.json') as theCustomerFile:
+            data = json.load(theCustomerFile)
+        return render_template('jsonCustomerTable.html', n=len(data), theData=data)
+
+@app.route('/adduser',methods=['POST'])
+def add_user():
+    dataFromUser = request.get_json(force=True)
+    if db.user.find({'Email': dataFromUser['email']}).count() <= 0:
+        db.user.insert_one({'Name':dataFromUser['firstName'],'Last':dataFromUser['lastName'],
+        'Email':dataFromUser['email'],'Password':dataFromUser['password'],'Role':dataFromUser['role']})
+        print("User has been created")
+        response = {'responseServer': 'Yes'}
+        responseToJson = json.dumps(response)
+        return responseToJson
+    else:
+        print("User already exists")
+        response = {'responseServer': 'No'}
+        responseToJson = json.dumps(response)
+        return responseToJson
+
+@app.route('/login',methods=['POST'])
+def verifyUser():
+    userToLogin = request.get_json(force=True)
+    if db.user.find({'Email' : userToLogin['email']}).count() <=0:
+        print("User does not exist")
+        responseLogin = {'responseLogin': 'User does not exist'}
+        responseLoginToJson = json.dumps(responseLogin)
+        return responseLoginToJson
+
+    else:
+        user = db.user.find_one({'Email' : userToLogin['email']})
+        if(user['Password'] == userToLogin['password']):
+            print("Welcome to the game ")
+            responseLogin = {'responseLogin': 'Right User','name':user['Name'],'last':user['Last'],'role':['Role']}
+            responseLoginToJson = json.dumps(responseLogin)
+            return responseLoginToJson
+
+        else:
+            print("Wrong password")
+            responseLogin = {'responseLogin': 'Wrong Password'}
+            responseLoginToJson = json.dumps(responseLogin)
+            return responseLoginToJson
+
+@app.route('/user',methods=['POST'])
+def add_data():
+
+    fname = "dummyData.json"
+    dataFromUser = request.get_json(force=True)
+    print(dataFromUser,flush = True)
+    if os.path.isfile(fname):
+        with open('dummyData.json','a') as file:
+            file.seek(file.tell()-1, os.SEEK_SET)
+            file.truncate()
+            file.write(',\n')
+            json.dump(dataFromUser,file)
+            file.write(']')
+    else:
+        with open(fname,'w') as file:
+            array = []
+            array.append(dataFromUser)
+            json.dump(array,file)
+    return 'saved'
+
+@app.route('/addMC',methods=['POST'])
+def add_mc():
+    dataFromMc = request.get_json(force=True)
+    if db.mainclaim.find({'mc': dataFromMc['mc']}).count() <= 0:
+        db.mainclaim.insert_one({'mc':dataFromMc['mc']})
+        print("Mc has been created")
+        response = {'responseServer': 'Yes'}
+        responseToJson = json.dumps(response)
+        return responseToJson
+    else:
+        print("Mc already exists")
+        response = {'responseServer': 'No'}
+        responseToJson = json.dumps(response)
+        return responseToJson
+
+
+## Create a new RiP
+## Follows format - RIP_TABLE (RIP_ID, RIP_STATEMENT ,RIP_SUBMITTED_BY, RIP_VOTE, MC_ID)
+@app.route('/createRip', methods=['POST'])
+def add_rip():
+    dataFromUser = request.get_json(force=True)
+    db.rip.insert_one(
+        {
+            'rip_statement':dataFromUser['ripStatement'],
+            'rip_submitted_by':dataFromUser['ripSubmittedBy'],
+            'rip_vote':dataFromUser['ripVote'],
+            'rip_mc_id':dataFromUser['mcID']
+        }
+    )
+    print("RiP has been created")
+
+    response = {'responseServer': 'Yes'}
+    responseToJson = json.dumps(response)
+    return responseToJson
+
+## For displaying all RiPs for selection
+@app.route('/getAllRips', methods=['GET'])
+def get_rips():
+    collection = db['rip'] ## The Collection - RiP Table
+    jsonArray = [] ## want an array so we can access all objects
+    for doc in collection.find():
+        print(doc) ## for testing in terminal
+        print()
+        jsonArray.append(json.dumps(doc, default=str))## force ObjectID to string
+    print(jsonArray)
+
+    return json.dumps(jsonArray)
+
+## only used to update the Statement
+@app.route('/updateRip', methods=['POST'])
+def update_rip():
+    dataFromUser = request.get_json(force=True)
+
+    db.rip.update_one(
+        { "_id" : dataFromUser["ripID"]},
+        { "$set" : {"rip_statement" : dataFromUser['ripStatement']} }
+    )
+
+    responseUpdateRip = {'responseUpdateRip': 'RiP does not exist'}
+    responseUpdateRipToJson = json.dumps(responseUpdateRip)
+    return responseUpdateRipToJson
+
+## selected a RiP to Vote for putting into play - increment Vote?
+@app.route('/incrementRipVote', methods=['POST'])
+def select_rip():
+    dataFromUser = request.get_json(force=True)
+    col = db['rip']
+
+    ##increment number locally in app, then update new total
+    col.update_one({"rip_id" : dataFromUser['ripID']}, {"$set":{"rip_vote" : dataFromUser['ripVote']} })
+    ## test response
+    response = {'responseServer': 'Yes'}
+    responseToJson = json.dumps(response)
+    return responseToJson
+## Need a query to find RiP with the most votes - return it and set all votes to 0? - For subsequent votes
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0',debug=True)
