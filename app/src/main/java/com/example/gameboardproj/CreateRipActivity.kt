@@ -72,18 +72,14 @@ class CreateRipActivity : AppCompatActivity() {
         var url = fileReader.readLine()
 
         var listOfRips = ArrayList<RiP>()
-        getRips(url, listOfRips)
+        var array = getRips(url, listOfRips)
 
-
-        Log.d("testing", listOfRips.toString())
-        for(entity in listOfRips ){
-            Log.d("testing", listOfRips.toString())
+        for(entity in array){
             Log.d("testing", entity.toString())
         }
-        var array = emptyArray<RiP>()
 
-        layoutManager = LinearLayoutManager(this)
-        adapter = MyAdapter(array)
+
+
 
 
 
@@ -167,34 +163,36 @@ class CreateRipActivity : AppCompatActivity() {
         }
     }
 
-    private fun getRips(url : String, listOfRips :  ArrayList<RiP>) {
+    private fun getRips(url : String, listOfRips :  ArrayList<RiP>) :  Array<RiP>{
 
         // URL Path to return all Rips in DB
         var urlPath = "$url/getAllRips"
+        var array : Array<RiP> = emptyArray()
 
         // Follows format - RIP_TABLE (RIP_ID, RIP_STATEMENT ,RIP_SUBMITTED_BY, RIP_VOTE, MC_ID)
         val requestQueue = Volley.newRequestQueue(this)
         val getRequest = JsonArrayRequest(
             Request.Method.GET,    // How
-            urlPath,                // Where
-            null,           // What
+            urlPath,
+            null,// What
             Response.Listener { response ->
-                for (i in 0 until response.length()) {
-                    val rip = response.getJSONObject(i)
+                for(i in 0 until response.length()) {
+                    // now hold a string of the object
+                    var entity : String = response[i] as String
+                    var splitString = entity.split(",",":")
 
-                    val id = rip.getString("rip_id")
-                    val statement = rip.getString("rip_statement")
-                    val submittedBy = rip.getInt("rip_submitted_by")
-                    val vote = rip.getInt("rip_vote")
-                    val forMC = rip.getInt("rip_mc_id")
-                    val ripObject: RiP = RiP(id, statement, submittedBy, vote, forMC)
+                    val id = splitString[1].filterNot { it == '"' }.trim()
+                    val statement = splitString[3].filterNot { it == '"' }.trim()
+                    val submittedBy = Integer.parseInt(splitString[5].trim())
+                    val vote = Integer.parseInt(splitString[7].trim())
+                    val forMC = Integer.parseInt(splitString[9].dropLast(1).trim())
+                    var ripObject: RiP = RiP(id, statement, submittedBy, vote, forMC)
 
-                    Log.d("testing", ripObject.toString())
+                    // Log.d("testing", ripObject.toString())
                     listOfRips.add(ripObject)
                 }
-
-
-
+                array = listOfRips.toTypedArray()
+                refreshRecycler(array)
             },
             Response.ErrorListener {
                 println(it.toString())
@@ -202,6 +200,16 @@ class CreateRipActivity : AppCompatActivity() {
         )
         // put query into request queue and perform
         requestQueue.add(getRequest)
+        return array
+    }
+
+    private fun refreshRecycler(array : Array<RiP>){
+        layoutManager = LinearLayoutManager(this)
+        adapter = MyAdapter(array)
+
+        recyclerView = findViewById<RecyclerView>(R.id.ripRecyclerView)
+        recyclerView.layoutManager = layoutManager
+        recyclerView.adapter = adapter
     }
 }
 
