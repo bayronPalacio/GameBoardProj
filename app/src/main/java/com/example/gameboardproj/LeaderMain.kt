@@ -47,7 +47,7 @@ class LeaderMain : AppCompatActivity() {
                 val req = JsonObjectRequest(
                     Request.Method.POST, urlPath, newMC,
                     Response.Listener { response ->
-                        if(response["responseServer"].toString().equals("Yes")){
+                        if(response["responseServer"].toString().equals("Yes") ||response["responseServer"].toString().equals("Updated")){
                             Toast.makeText(this, "MC has been created", Toast.LENGTH_LONG).show()
 
                         }

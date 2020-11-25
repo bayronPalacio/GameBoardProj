@@ -49,10 +49,9 @@ def verifyUser():
         user = db.user.find_one({'Email' : userToLogin['email']})
         if(user['Password'] == userToLogin['password']):
             print("Welcome to the game ")
-            responseLogin = {'responseLogin': 'Right User','name':user['Name'],'last':user['Last'],'role':['Role']}
+            responseLogin = {'responseLogin': 'Right User','name':user['Name'],'last':user['Last'],'role':user['Role']}
             responseLoginToJson = json.dumps(responseLogin)
             return responseLoginToJson
-
         else:
             print("Wrong password")
             responseLogin = {'responseLogin': 'Wrong Password'}
@@ -61,7 +60,6 @@ def verifyUser():
 
 @app.route('/user',methods=['POST'])
 def add_data():
-
     fname = "dummyData.json"
     dataFromUser = request.get_json(force=True)
     print(dataFromUser,flush = True)
@@ -154,6 +152,47 @@ def select_rip():
     responseToJson = json.dumps(response)
     return responseToJson
 ## Need a query to find RiP with the most votes - return it and set all votes to 0? - For subsequent votes
+
+
+//**************NEW ADDMC AND GET MC ****************//
+@app.route('/addMC',methods=['POST'])
+def add_mc():
+    dataFromMc = request.get_json(force=True)
+    if db.mainclaim.count() <= 0:
+        db.mainclaim.insert_one({'mc':dataFromMc['mc']})
+        print("Mc has been created")
+        response = {'responseServer': 'Yes'}
+        responseToJson = json.dumps(response)
+        return responseToJson
+    else:
+        print("Mc will be updated")
+        cursor = db.mainclaim.find({})
+        for document in cursor:
+            print(document['_id'])
+            db.mainclaim.update_one(
+                {'_id':document['_id']},
+                {'$set':
+                    {'mc':dataFromMc['mc']}
+
+                })
+        response = {'responseServer': 'Updated'}
+        responseToJson = json.dumps(response)
+        return responseToJson
+
+
+@app.route('/getMC',methods=['GET'])
+def get_mc():
+    if db.mainclaim.count() > 0:
+        index = db.mainclaim.find({})
+        for originalMC in index:
+            print(originalMC['mc'])
+            mainClaim = originalMC['mc']
+        return mainClaim
+    else:
+        return "NoMC"
+
+
+
 
 
 if __name__ == '__main__':

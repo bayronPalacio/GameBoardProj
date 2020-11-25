@@ -61,12 +61,17 @@ class LoginActivity : AppCompatActivity() {
                         }
                         else if(response["responseLogin"].toString().equals("Right User")){
                             Toast.makeText(this, "Welcome " + response["name"] + " " + response["last"], Toast.LENGTH_LONG).show()
-                           // val editor = sharedPrefFile!!.edit()
-                            //editor.putInt("userID", response["_id"] as Int)
-                            //editor.apply()
+                            val editor = sharedPrefFile!!.edit()
+                            editor.putString("Name", response["name"].toString() + " " + response["last"].toString())
+                            editor.putInt("Role", response["role"] as Int)
+                            editor.apply()
                             if(response["role"].toString().equals("0")){
-                                val toLogin = Intent(this,LeaderMain::class.java)
-                                startActivity(toLogin)
+                                val toLeader = Intent(this,LeaderMain::class.java)
+                                startActivity(toLeader)
+                            }
+                            else if (response["role"].toString().equals("1")){
+                                val toStudent = Intent(this,UserMain::class.java)
+                                startActivity(toStudent)
                             }
                         }
                         else if(response["responseLogin"].toString().equals("User does not exist")){
@@ -79,8 +84,8 @@ class LoginActivity : AppCompatActivity() {
                 )
                 que.add(req)
 
-                val login = Intent(this, CreateRipActivity::class.java)
-                startActivity(login)
+//                val login = Intent(this, CreateRipActivity::class.java)
+//                startActivity(login)
             }
         }
 
@@ -140,3 +145,4 @@ class LoginActivity : AppCompatActivity() {
 //        }
     }
 }
+
