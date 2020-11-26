@@ -36,20 +36,38 @@
         android:hint="@string/example_rip"
         android:inputType="textMultiLine" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/backgroundColor"
+        android:orientation="horizontal"
+        tools:context=".CreateRipActivity">
+
+        <Button
+            android:id="@+id/create_rip"
+            android:layout_width="150dp"
+            android:layout_height="40dp"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:text="@string/create_rip" />
+
+        <Button
+            android:id="@+id/update_rip"
+            android:layout_width="150dp"
+            android:layout_height="40dp"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:text="@string/update_rip" />
+
+    </LinearLayout>
+
 
     <Button
-        android:id="@+id/create_rip"
-        android:layout_width="match_parent"
+        android:id="@+id/vote_rip"
+        android:layout_width="150dp"
         android:layout_height="40dp"
-        android:layout_margin="20dp"
-        android:text="@string/create_rip" />
-
-    <Button
-        android:id="@+id/update_rip"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_margin="20dp"
-        android:text="@string/update_rip" />
-
+        android:layout_margin="5dp"
+        android:layout_gravity="center"
+        android:text="@string/vote_rip_button" />
 
 </LinearLayout>

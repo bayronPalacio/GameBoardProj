@@ -1,25 +1,15 @@
 package com.example.gameboardproj
 
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Adapter
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.gameboardproj.data.ReasonInPlay
-import com.example.gameboardproj.data.ReasonInPlayDao
-import com.google.gson.JsonObject
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_group.*
 import java.io.BufferedReader
 
@@ -29,9 +19,6 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-import com.google.gson.JsonArray
-import kotlinx.android.synthetic.main.activity_leader_main.*
-import org.json.JSONArray
 
 /**
  * @author Daniel Cooper
@@ -42,6 +29,12 @@ import org.json.JSONArray
  * after RiP creation will navigate to the game board
  *
  * Must find current user, current RiP, and current MC on activity start
+ *
+ *
+ *
+ * TODO
+ * Make RecyclerView refresh after Create and Update (have to leave page and return atm)
+ * Once vote is completed - navigate to another page
  *
  */
 
@@ -54,6 +47,7 @@ class CreateRipActivity : AppCompatActivity() {
     private var ripStatement = ""
    // private val sharedPrefFile : SharedPreferences? = this.getSharedPreferences("sharedPreferences", 0);
     private var userID = null;
+    private var selectedRip = ""
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var layoutManager: RecyclerView.LayoutManager
@@ -77,18 +71,6 @@ class CreateRipActivity : AppCompatActivity() {
         for(entity in array){
             Log.d("testing", entity.toString())
         }
-
-
-
-
-
-
-        // Shared Preferences, user data needed to implement RiP
-        //val sharedPreferences: SharedPreferences = this.getSharedPreferences(sharedPrefFile, Context.MODE_PRIVATE)
-        //var userFirstName = sharedPreferences.getString("user_firstName", "not found")
-        //var userLastName = sharedPreferences.getString("user_lastName", "not found")
-        // var currentMC =    will need to access MC
-
 
         create_rip.setOnClickListener {
             // If ReasonInPlay Input has text
@@ -130,36 +112,64 @@ class CreateRipActivity : AppCompatActivity() {
             }
         }
 
-        // Update RiP
-        // TextBox will contain the current RiP on Start
-        // Make Modification to Text, then Update
-        // Check that current RiP ID exists, suggest Add
-        // If ID exist - change statement
         update_rip.setOnClickListener {
+            // URL Path to return all Rips in DB
+            var urlPath = "$url/updateRip"
 
-            if (ripInputText.text.trim().toString() != null) {
+            // Update the RiP
+            val reasonInPlay = JSONObject()
+            reasonInPlay.put("oldStatement", selectedRip) // will use to find the rip
+            reasonInPlay.put("ripStatement", ripInputText.text.toString()) // update this data
 
-                // The associated URL path to Server
-                var urlPath = "$url/createRip"
-
-                val reasonInPlay = JSONObject()
-
-                reasonInPlay.get("ripID")
-
-
-                /*
-                Observable.fromCallable {
-                    ripDao = dataBaseGame?.ripDao()
-
-                    //  change RiP statement and update
-                    if (ripStatement != "") {
-                        val rip: ReasonInPlay = ripDao!!.getRipByStatement(ripStatement)
-                        rip.rip_statement = ripStatement
-                        ripDao?.updateRip(rip)
+            val requestQueue = Volley.newRequestQueue(this)
+            val putRequest = JsonObjectRequest(
+                Request.Method.POST,
+                urlPath,
+                reasonInPlay,
+                { response ->
+                    if (response["responseServer"].toString().equals("Yes")) {
+                        Toast.makeText(this, "RiP has been updated", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this, "RiP does not exits", Toast.LENGTH_SHORT).show()
                     }
+                    println("Response from server -> " + response["responseServer"])
+                },
+                {
+                    println(it.toString())
                 }
-                 */
-            }
+            )
+            // put query into request queue and perform
+            requestQueue.add(putRequest)
+        }
+
+        vote_rip.setOnClickListener{
+            // URL Path to return all Rips in DB
+            var urlPath = "$url/incrementRipVote"
+
+            // Update the RiP
+            val reasonInPlay = JSONObject()
+            reasonInPlay.put("oldStatement", selectedRip) // will use to find the rip
+            reasonInPlay.put("ripVote", 1) // update this data
+
+            val requestQueue = Volley.newRequestQueue(this)
+            val putRequest = JsonObjectRequest(
+                Request.Method.POST,
+                urlPath,
+                reasonInPlay,
+                { response ->
+                    if (response["responseServer"].toString().equals("Yes")) {
+                        Toast.makeText(this, "Vote is cast", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this, "Vote failed - Please Try Again", Toast.LENGTH_SHORT).show()
+                    }
+                    println("Response from server -> " + response["responseServer"])
+                },
+                {
+                    println(it.toString())
+                }
+            )
+            // put query into request queue and perform
+            requestQueue.add(putRequest)
         }
     }
 
@@ -205,21 +215,28 @@ class CreateRipActivity : AppCompatActivity() {
 
     private fun refreshRecycler(array : Array<RiP>){
         layoutManager = LinearLayoutManager(this)
-        adapter = MyAdapter(array)
+        adapter = MyAdapter(array) { rip: RiP -> itemClicked(rip) }
 
         recyclerView = findViewById<RecyclerView>(R.id.ripRecyclerView)
         recyclerView.layoutManager = layoutManager
         recyclerView.adapter = adapter
     }
+
+    private fun itemClicked(rip : RiP) {
+        ripInputText.setText(rip.ripStatement)
+        selectedRip = rip.ripStatement.toString()
+        Log.d("testing", selectedRip)
+    }
 }
 
-class MyAdapter(private val dataSet : Array<RiP>):
+class MyAdapter(private val dataSet: Array<RiP>, val clickListener: (RiP) -> Unit) :
     RecyclerView.Adapter<MyAdapter.ViewHolder>() {
 
     inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
-        fun bindItem(rip : RiP) {
+        fun bindItem(rip: RiP, clickListener: (RiP) -> Unit) {
             val tv = view.findViewById<TextView>(R.id.ripTextView)
             tv.text = rip.ripStatement
+            view.setOnClickListener { clickListener(rip) }
         }
     }
 
@@ -229,7 +246,7 @@ class MyAdapter(private val dataSet : Array<RiP>):
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bindItem(dataSet[position])
+        holder.bindItem(dataSet[position], clickListener)
     }
 
     override fun getItemCount(): Int {

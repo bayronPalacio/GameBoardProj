@@ -121,7 +121,6 @@ def get_rips():
         print(doc) ## for testing in terminal
         print()
         jsonArray.append(json.dumps(doc, default=str))## force ObjectID to string
-    print(jsonArray)
 
     return json.dumps(jsonArray)
 
@@ -130,27 +129,47 @@ def get_rips():
 def update_rip():
     dataFromUser = request.get_json(force=True)
 
-    db.rip.update_one(
-        { "_id" : dataFromUser["ripID"]},
-        { "$set" : {"rip_statement" : dataFromUser['ripStatement']} }
-    )
-
-    responseUpdateRip = {'responseUpdateRip': 'RiP does not exist'}
-    responseUpdateRipToJson = json.dumps(responseUpdateRip)
-    return responseUpdateRipToJson
+    ## Check if it exists
+    if db.rip.find({'rip_statement': dataFromUser['oldStatement']}).count() <= 0:
+        response = {'responseServer': 'Could Not Find RiP'}
+        responseToJson = json.dumps(response)
+        return responseToJson
+    else:
+        db.rip.update_one(
+            { "rip_statement" : dataFromUser["oldStatement"]},
+            { "$set" : {"rip_statement" : dataFromUser['ripStatement']} }
+        )
+        response = {'responseServer': 'Yes'}
+        responseToJson = json.dumps(response)
+        return responseToJson
 
 ## selected a RiP to Vote for putting into play - increment Vote?
 @app.route('/incrementRipVote', methods=['POST'])
 def select_rip():
     dataFromUser = request.get_json(force=True)
-    col = db['rip']
 
-    ##increment number locally in app, then update new total
-    col.update_one({"rip_id" : dataFromUser['ripID']}, {"$set":{"rip_vote" : dataFromUser['ripVote']} })
-    ## test response
-    response = {'responseServer': 'Yes'}
-    responseToJson = json.dumps(response)
-    return responseToJson
+    if db.rip.find({'rip_statement': dataFromUser['oldStatement']}).count() <= 0:
+        response = {'responseServer': 'Could Not Find RiP'}
+        responseToJson = json.dumps(response)
+        return responseToJson
+    else:
+        item = db.rip.find({'rip_statement': dataFromUser['oldStatement']})
+        collection = db['rip'] ## The Collection - RiP Table
+        for doc in collection.find():
+            print(doc['rip_statement'] == dataFromUser['oldStatement'])
+            if doc['rip_statement'] == dataFromUser['oldStatement']:
+                voteTally = doc['rip_vote']
+                voteTally += 1
+                db.rip.update_one(
+                    { "rip_statement" : dataFromUser["oldStatement"]},
+                    { "$set" : {"rip_vote" : voteTally} }
+                )
+
+
+        response = {'responseServer': 'Yes'}
+        responseToJson = json.dumps(response)
+        return responseToJson
+
 ## Need a query to find RiP with the most votes - return it and set all votes to 0? - For subsequent votes
 
 

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
@@ -63,16 +64,17 @@ class LoginActivity : AppCompatActivity() {
                             Toast.makeText(this, "Welcome " + response["name"] + " " + response["last"], Toast.LENGTH_LONG).show()
                             val editor = sharedPrefFile!!.edit()
                             editor.putString("Name", response["name"].toString() + " " + response["last"].toString())
-                            editor.putInt("Role", response["role"] as Int)
+                            //editor.putInt("Role", response["role"] as Int)
                             editor.apply()
                             if(response["role"].toString().equals("0")){
                                 val toLeader = Intent(this,LeaderMain::class.java)
                                 startActivity(toLeader)
                             }
-                            else if (response["role"].toString().equals("1")){
+                            else if (response["role"].toString().compareTo("1") == 0){
                                 val toStudent = Intent(this,UserMain::class.java)
                                 startActivity(toStudent)
                             }
+                            Log.d("testing", response["role"].toString() )
                         }
                         else if(response["responseLogin"].toString().equals("User does not exist")){
                             Toast.makeText(this, "This account does not exist", Toast.LENGTH_LONG).show()
@@ -83,7 +85,6 @@ class LoginActivity : AppCompatActivity() {
                     }
                 )
                 que.add(req)
-
 //                val login = Intent(this, CreateRipActivity::class.java)
 //                startActivity(login)
             }

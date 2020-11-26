@@ -37,6 +37,7 @@
     <string name="playerRole">Player</string>
     <string name="update_rip">update RiP</string>
     <string name="studentid">Student ID</string>
+    <string name="vote_rip_button">Vote</string>
 
 
 </resources>
