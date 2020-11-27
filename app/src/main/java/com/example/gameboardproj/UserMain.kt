@@ -31,6 +31,7 @@ class UserMain : AppCompatActivity() {
         setContentView(R.layout.activity_user_main)
 
         sharedPrefFile = this.getSharedPreferences("sharedPreferences", 0);
+        val editor = sharedPrefFile!!.edit()
 
         var name = sharedPrefFile?.getString("Name",null)
 
@@ -43,6 +44,17 @@ class UserMain : AppCompatActivity() {
         val mcTest = JSONObject()
         mcTest.put("mc", "")
 
+        // Vote For MC
+        agree.setOnClickListener{
+            editor.putString("mcVote", "Agree")
+            editor.apply()
+        }
+
+        // Vote Against MC
+        disagree.setOnClickListener{
+            editor.putString("mcVote", "Disagree")
+            editor.apply()
+        }
 
 //        val que = Volley.newRequestQueue(this)
 ////        val getMCValue = JsonObjectRequest(

@@ -157,7 +157,6 @@ def select_rip():
         responseToJson = json.dumps(response)
         return responseToJson
     else:
-        item = db.rip.find({'rip_statement': dataFromUser['oldStatement']})
         collection = db['rip'] ## The Collection - RiP Table
         for doc in collection.find():
             print(doc['rip_statement'] == dataFromUser['oldStatement'])
@@ -174,8 +173,49 @@ def select_rip():
         responseToJson = json.dumps(response)
         return responseToJson
 
-## Need a query to find RiP with the most votes - return it and set all votes to 0? - For subsequent votes
+## returns the rip with the most votes and its statement
+@app.route('/findWinningRip', methods=['GET'])
+def select_winning_rip():
+    collection = db['rip'] ## The Collection - RiP Table
+    ## put all values into array - only statement and vote - sorted by votes
+    jsonArray = []
+    for doc in collection.find({}, {"_id": 0, "rip_vote": 1, "rip_statement": 2 }).sort("rip_vote"):
+        jsonArray.append(doc)
+        print(doc) ## for testing in terminal
+        print()
 
+    ## iterate through sorted array and take last value - highest
+    element = 0
+    for x in jsonArray:
+       element = x
+    print(element)
+
+    ## return item with highest votes
+    response = {'responseServer': 'Yes'}
+    responseToJson = json.dumps(response)
+    return json.dumps(element)
+
+## Vote for the Rip premise - true or false
+@app.route('/placeRipVote', methods=['POST'])
+def rip_second_vote():
+    ## need to send the current user name, their vote, the current Rip
+    dataFromUser = request.get_json(force=True)
+
+    collection = db['rip']
+    jsonArray = []
+    for doc in collection.find({}, {"_id": 0, "rip_statement": 1, "votesFor": 2, "votesAgainst": 3 }): ## _id isn't included...
+        jsonArray.append(doc)
+        print(doc)
+        if doc['rip_statement'] == dataFromUser['currentRip']:
+            item = doc
+
+    ## have to check if user name is in either votesFor or VotesAgainst
+    ## if found delete then place vote
+
+
+    response = {'responseServer': 'Yes'}
+    responseToJson = json.dumps(response)
+    return json.dumps(response)
 
 //**************NEW ADDMC AND GET MC ****************//
 @app.route('/addMC',methods=['POST'])

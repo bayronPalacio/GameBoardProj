@@ -38,6 +38,12 @@
     <string name="update_rip">update RiP</string>
     <string name="studentid">Student ID</string>
     <string name="vote_rip_button">Vote</string>
+    <string name="title_activity_game_board_right">GameBoardRightActivity</string>
+    <!--
+    This string is used for square devices and overridden by hello_world in
+    values-round/strings.xml for round devices.
+    -->
+    <string name="hello_world">Hello Square World!</string>
 
 
 </resources>

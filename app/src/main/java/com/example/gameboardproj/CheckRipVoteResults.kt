@@ -1,26 +1,46 @@
 package com.example.gameboardproj
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
+import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import kotlinx.android.synthetic.main.activity_check_vote_result.*
+import org.json.JSONObject
 import java.io.BufferedReader
 
-class CheckVoteResults : AppCompatActivity() {
+/**
+ * @author Daniel Cooper
+ *
+ * Displays the list of RiPs and their votes
+ * A holding area while players wait for all votes to be made
+ * Once all players have voted they can proceed to the game
+ *
+ * TODO
+ *  Make RecyclerView refresh after Create and Update (have to leave page and return atm)
+ *  buttonToGame - needs to check if total number of VOTES is the same as total number of players
+ *  get rip with most vvo
+ */
+class CheckRipVoteResults : AppCompatActivity() {
+
+    private lateinit var sharedPrefFile : SharedPreferences
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var layoutManager: RecyclerView.LayoutManager
     private lateinit var adapter: RecyclerView.Adapter<*>
+    private var initialMCVote = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,12 +49,62 @@ class CheckVoteResults : AppCompatActivity() {
         var fileReader: BufferedReader = application.assets.open("url.txt").bufferedReader()
         var url = fileReader.readLine()
 
+        sharedPrefFile = this.getSharedPreferences("sharedPreferences", 0);
+        initialMCVote = sharedPrefFile.getString("mcVote", "").toString()
+
         var listOfRips = ArrayList<RiP>()
 
         getRips(url, listOfRips)
 
         buttonBackToCreateRip.setOnClickListener{
             startActivity(Intent(this, CreateRipActivity::class.java ))
+        }
+
+        buttonToGame.setOnClickListener{
+            // count votes
+            var totalVotes = 0
+            var winningRip : RiP
+            for(rip : RiP in listOfRips){
+                totalVotes += rip.ripVote
+                var individualVotes = 0
+                individualVotes = rip.ripVote
+                for(rip : RiP in listOfRips){
+                    if(rip.ripVote > individualVotes)
+                        winningRip = rip
+                }
+            }
+            Log.d("testing", totalVotes.toString())
+            var urlPath = "$url/findWinningRip"
+            var rip : JSONObject
+            val requestQueue = Volley.newRequestQueue(this)
+            val getRequest = JsonObjectRequest(
+                Request.Method.GET,    // How
+                urlPath,                // Where
+                null,           // What
+                Response.Listener { response ->
+                    var rip : String = response["rip_statement"] as String
+                    println(rip.toString())
+                    val editor = sharedPrefFile!!.edit()
+                    editor.putString("currentRip", rip)
+                    editor.apply()
+                },
+                Response.ErrorListener {
+                    println("Error from server")
+                }
+
+
+            )
+            // put query into request queue and perform
+            requestQueue.add(getRequest)
+
+            // check if total votes >= number of players
+            if(totalVotes >= 1) {
+                // Go to game
+                if (initialMCVote.compareTo("Agree") == 0)
+                    startActivity(Intent(this, GameBoardRightActivity::class.java))
+                else
+                    startActivity(Intent(this, GameBoardLeftActivity::class.java))
+            }
         }
     }
 

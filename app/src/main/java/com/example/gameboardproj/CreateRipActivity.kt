@@ -177,9 +177,8 @@ class CreateRipActivity : AppCompatActivity() {
             )
             // put query into request queue and perform
             requestQueue.add(putRequest)
-
             // Once Voted - Move to see Results
-            startActivity(Intent(this, CheckVoteResults::class.java))
+            startActivity(Intent(this, CheckRipVoteResults::class.java))
         }
     }
 
