@@ -214,6 +214,30 @@ def get_mc():
     else:
         return "NoMC"
 
+@app.route('/setTime',methods=['POST'])
+def set_time():
+    dataFromTime = request.get_json(force=True)
+    if db.time.count() <= 0:
+        db.time.insert_one({'time':dataFromTime['time']})
+        print("Time has been created")
+        response = {'responseServer': 'Yes'}
+        responseToJson = json.dumps(response)
+        return responseToJson
+    else:
+        print("Time will be updated")
+        cursor = db.time.find({})
+        for document in cursor:
+            print(document['_id'])
+            db.time.update_one(
+                {'_id':document['_id']},
+                {'$set':
+                    {'time':dataFromTime['time']}
+
+                })
+        response = {'responseServer': 'Updated'}
+        responseToJson = json.dumps(response)
+        return responseToJson
+
 
 
 

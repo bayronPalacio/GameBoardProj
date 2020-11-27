@@ -2,6 +2,7 @@ package com.example.gameboardproj
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
@@ -47,12 +48,11 @@ class LeaderMain : AppCompatActivity() {
                 val req = JsonObjectRequest(
                     Request.Method.POST, urlPath, newMC,
                     Response.Listener { response ->
-                        if(response["responseServer"].toString().equals("Yes") ||response["responseServer"].toString().equals("Updated")){
+                        if(response["responseServer"].toString().equals("Yes") ){
                             Toast.makeText(this, "MC has been created", Toast.LENGTH_LONG).show()
-
                         }
-                        else{
-                            Toast.makeText(this, "MC already exits", Toast.LENGTH_LONG).show()
+                        else if(response["responseServer"].toString().equals("Updated")){
+                            Toast.makeText(this, "MC has been updated", Toast.LENGTH_LONG).show()
                         }
                         println("Response from server -> " + response["responseServer"])
                     }, Response.ErrorListener {
@@ -74,6 +74,47 @@ class LeaderMain : AppCompatActivity() {
 //                    .subscribe()
 //                Toast.makeText(this,"A new main claim has been created",Toast.LENGTH_LONG).show()
             }
+        }
+
+
+
+        var time = timer.text.toString().toLong()
+        var urlPath = "$url/setTime"
+
+        val newTime = JSONObject()
+        val timer = object: CountDownTimer(time*1000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                timer.setText(time.toString())
+                newTime.put("time", time)
+
+                val que = Volley.newRequestQueue(applicationContext)
+                val req = JsonObjectRequest(
+                    Request.Method.POST, urlPath, newTime,
+                    Response.Listener { response ->
+                        if(response["responseServer"].toString().equals("Yes") ){
+                            Toast.makeText(applicationContext, "Time has been created", Toast.LENGTH_LONG).show()
+                        }
+                        else if(response["responseServer"].toString().equals("Updated")){
+                            Toast.makeText(applicationContext, "Time has been updated", Toast.LENGTH_LONG).show()
+                        }
+                        println("Response from server -> " + response["responseServer"])
+                    }, Response.ErrorListener {
+                        println("Error from server")
+                    }
+                )
+                que.add(req)
+                time = (time*1000 - 1000)/1000
+            }
+            override fun onFinish() {}
+        }
+
+        startScrimmage.setOnClickListener {
+            timer.start()
+
+        }
+
+        endScrimmage.setOnClickListener {
+            timer.cancel()
         }
 
         checkVote.setOnClickListener{
