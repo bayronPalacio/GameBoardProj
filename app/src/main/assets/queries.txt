@@ -98,12 +98,16 @@ def add_mc():
 @app.route('/createRip', methods=['POST'])
 def add_rip():
     dataFromUser = request.get_json(force=True)
+    votesFor = []
+    votesAgainst = []
     db.rip.insert_one(
         {
             'rip_statement':dataFromUser['ripStatement'],
             'rip_submitted_by':dataFromUser['ripSubmittedBy'],
             'rip_vote':dataFromUser['ripVote'],
-            'rip_mc_id':dataFromUser['mcID']
+            'mc_statement':dataFromUser['mcStatement'],
+            'votesFor' : votesFor,
+            'votesAgainst' : votesAgainst
         }
     )
     print("RiP has been created")

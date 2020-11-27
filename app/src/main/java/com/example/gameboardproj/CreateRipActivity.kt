@@ -1,5 +1,7 @@
 package com.example.gameboardproj
 
+import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -18,6 +20,7 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 
 /**
@@ -25,17 +28,16 @@ import com.android.volley.toolbox.Volley
  *
  * Allows for the creation and modification of RiP's
  *
- * has a listener for two buttons that update or create RiPs
- * after RiP creation will navigate to the game board
+ * Enter Text into the TextBox then Press Create to Create a RIP
+ * All RIPS will be displayed within the RecyclerView
  *
- * Must find current user, current RiP, and current MC on activity start
- *
- *
+ * Select a RIP in the RecyclerView to have its statement autofill the below textbox
+ * Modify the Text and press Update to Modify
+ * OR
+ * Press Vote to vote for the RIP that was selected
  *
  * TODO
  * Make RecyclerView refresh after Create and Update (have to leave page and return atm)
- * Once vote is completed - navigate to another page
- *
  */
 
 class CreateRipActivity : AppCompatActivity() {
@@ -44,10 +46,10 @@ class CreateRipActivity : AppCompatActivity() {
     //private var dataBaseGame = GameDatabase.getAppDataBase(context = this)
     //private var ripDao: ReasonInPlayDao? = null
 
-    private var ripStatement = ""
-   // private val sharedPrefFile : SharedPreferences? = this.getSharedPreferences("sharedPreferences", 0);
-    private var userID = null;
+    private lateinit var sharedPrefFile : SharedPreferences
+    private var currentUser = ""
     private var selectedRip = ""
+    private var mainClaim = ""
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var layoutManager: RecyclerView.LayoutManager
@@ -58,16 +60,21 @@ class CreateRipActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_group)
 
-        // User Name
-        //sharedPrefFile?.getString("userID", "DefaultName")
+        // Get UserName from Shared Preferences
+        sharedPrefFile = this.getSharedPreferences("sharedPreferences", 0);
+        currentUser = sharedPrefFile.getString("Name", "").toString()
 
         // Access text file query Server
         var fileReader: BufferedReader = application.assets.open("url.txt").bufferedReader()
         var url = fileReader.readLine()
 
+        // Get Main Claim from DB
+        getMC(url)
+
+        // Create an Array of RiPs, ArrayList used to get data (Size unknown), copied to array
         var listOfRips = ArrayList<RiP>()
         var array = getRips(url, listOfRips)
-
+        // Test for data
         for(entity in array){
             Log.d("testing", entity.toString())
         }
@@ -84,9 +91,9 @@ class CreateRipActivity : AppCompatActivity() {
                 // Follows format - RIP_TABLE (RIP_ID, RIP_STATEMENT ,RIP_SUBMITTED_BY, RIP_VOTE, MC_ID)
                 // unique ID is pre-generated
                 reasonInPlay.put("ripStatement", ripInputText.text.toString())
-                reasonInPlay.put("ripSubmittedBy", 1) // dummy val
+                reasonInPlay.put("ripSubmittedBy", currentUser)
                 reasonInPlay.put("ripVote", 0)
-                reasonInPlay.put("mcID", 1) // dummy val
+                reasonInPlay.put("mcStatement", mainClaim)
 
                 val requestQueue = Volley.newRequestQueue(this)
                 val createRequest = JsonObjectRequest(
@@ -170,6 +177,9 @@ class CreateRipActivity : AppCompatActivity() {
             )
             // put query into request queue and perform
             requestQueue.add(putRequest)
+
+            // Once Voted - Move to see Results
+            startActivity(Intent(this, CheckVoteResults::class.java))
         }
     }
 
@@ -193,9 +203,9 @@ class CreateRipActivity : AppCompatActivity() {
 
                     val id = splitString[1].filterNot { it == '"' }.trim()
                     val statement = splitString[3].filterNot { it == '"' }.trim()
-                    val submittedBy = Integer.parseInt(splitString[5].trim())
+                    val submittedBy = splitString[5].trim()
                     val vote = Integer.parseInt(splitString[7].trim())
-                    val forMC = Integer.parseInt(splitString[9].dropLast(1).trim())
+                    val forMC = splitString[9].dropLast(1).trim()
                     var ripObject: RiP = RiP(id, statement, submittedBy, vote, forMC)
 
                     // Log.d("testing", ripObject.toString())
@@ -211,6 +221,22 @@ class CreateRipActivity : AppCompatActivity() {
         // put query into request queue and perform
         requestQueue.add(getRequest)
         return array
+    }
+
+    private fun getMC(url : String) {
+        var urlPath = "$url/getMC"
+
+        val queue = Volley.newRequestQueue(this)
+        val stringRequest = StringRequest(
+            Request.Method.GET, urlPath,
+            Response.Listener<String> { response ->
+                // Display the first 500 characters of the response string.
+                Log.i("Res",response)
+                mainClaim = "$response"
+//                        textView.text = "Response is: ${response.substring(0, 500)}"
+            },
+            Response.ErrorListener { Log.i("res","did not work")})
+        queue.add(stringRequest)
     }
 
     private fun refreshRecycler(array : Array<RiP>){
@@ -229,7 +255,8 @@ class CreateRipActivity : AppCompatActivity() {
     }
 }
 
-class MyAdapter(private val dataSet: Array<RiP>, val clickListener: (RiP) -> Unit) :
+// Adapter for Recycler View
+class MyAdapter(private var dataSet: Array<RiP>, val clickListener: (RiP) -> Unit) :
     RecyclerView.Adapter<MyAdapter.ViewHolder>() {
 
     inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
@@ -252,13 +279,18 @@ class MyAdapter(private val dataSet: Array<RiP>, val clickListener: (RiP) -> Uni
     override fun getItemCount(): Int {
         return dataSet.size
     }
+
+    fun update(modelList : Array<RiP>){
+        dataSet = modelList
+        notifyDataSetChanged()
+    }
 }
 
 // Follows format - RIP_TABLE (RIP_ID, RIP_STATEMENT ,RIP_SUBMITTED_BY, RIP_VOTE, MC_ID)
-data class RiP constructor(val ripID : String, val ripStatement : String, val ripSubmittedBy : Int, val ripVote : Int, val ripMainClaimID : Int){
+data class RiP constructor(val ripID : String, val ripStatement : String, val ripSubmittedBy : String, val ripVote : Int, val ripMainClaimStatement : String){
 
     override fun toString(): String {
-        return "RiP(ripID='$ripID', ripStatement='$ripStatement', ripSubmittedBy=$ripSubmittedBy, ripVote=$ripVote, ripMainClaimID=$ripMainClaimID)"
+        return "RiP(ripID='$ripID', ripStatement='$ripStatement', ripSubmittedBy=$ripSubmittedBy, ripVote=$ripVote, ripMainClaimID=$ripMainClaimStatement)"
     }
 }
 
