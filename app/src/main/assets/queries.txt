@@ -197,23 +197,80 @@ def select_winning_rip():
 
 ## Vote for the Rip premise - true or false
 @app.route('/placeRipVote', methods=['POST'])
-def rip_second_vote():
+def place_rip_second_vote():
     ## need to send the current user name, their vote, the current Rip
     dataFromUser = request.get_json(force=True)
-
     collection = db['rip']
-    jsonArray = []
+    print(dataFromUser['currentUser'] + dataFromUser['vote'] + dataFromUser['currentRip'])
+
+    arrayOfEntities = []
+    jsonArrayOfVotesFor = []
+    jsonArrayOfVotesAgainst = []
+
     for doc in collection.find({}, {"_id": 0, "rip_statement": 1, "votesFor": 2, "votesAgainst": 3 }): ## _id isn't included...
-        jsonArray.append(doc)
+        arrayOfEntities.append(doc)
         print(doc)
         if doc['rip_statement'] == dataFromUser['currentRip']:
             item = doc
+            jsonArrayOfVotesFor = item['votesFor']
+            jsonArrayOfVotesAgainst = item['votesAgainst']
 
-    ## have to check if user name is in either votesFor or VotesAgainst
-    ## if found delete then place vote
+    ## have to check if user name is in either votesFor or VotesAgainst - remove if found
+    for x in jsonArrayOfVotesFor:
+        if dataFromUser['currentUser'] in x:
+            jsonArrayOfVotesFor.remove(dataFromUser['currentUser'])
+
+    for x in jsonArrayOfVotesAgainst:
+        if dataFromUser['currentUser'] in x:
+            jsonArrayOfVotesAgainst.remove(dataFromUser['currentUser'])
+
+    ## if vote is true update votesFor
+    if dataFromUser['vote'] == "True":
+        jsonArrayOfVotesFor.append(dataFromUser['currentUser'])
+        db.rip.update_one(
+            { "rip_statement" : dataFromUser["currentRip"]},
+            { "$set" :
+                {"votesFor" : jsonArrayOfVotesFor }
+
+        })
+        response = {'responseServer': 'VotesFor Updated'}
+        responseToJson = json.dumps(response)
+        return json.dumps(response)
+    ## if vote is false update votesAgainst
+    elif dataFromUser['vote'] == "False":
+        jsonArrayOfVotesAgainst.append(dataFromUser['currentUser'])
+        db.rip.update_one(
+            { "rip_statement" : dataFromUser["currentRip"]},
+            { "$set" :
+                {"votesAgainst" : jsonArrayOfVotesAgainst }
+
+        })
+        response = {'responseServer': 'VotesAgainst Updated'}
+        responseToJson = json.dumps(response)
+        return json.dumps(response)
+    else:
+        response = {'responseServer': 'Update Failed'}
+        responseToJson = json.dumps(response)
+        return json.dumps(response)
 
 
-    response = {'responseServer': 'Yes'}
+## Get the vote arrays of final votes
+@app.route('/getFinalRipVote', methods=['GET'])
+def get_rip_second_vote():
+    ## will need to send the current rip statement
+    ## dataFromUser = request.get_json(force=True)
+    collection = db['rip']
+    arrayOfEntities = []
+
+    for doc in collection.find({}, {"_id": 0, "rip_statement": 1, "votesFor": 2, "votesAgainst": 3 }):
+        arrayOfEntities.append(doc)
+        if doc['rip_statement'] == 'A new rip':
+            item = doc
+            ## Test
+            print("this is the selected item: " + json.dumps(item))
+            return json.dumps(item)
+    ## If RiP does not exist
+    response = {'responseServer': 'RiP does not exist'}
     responseToJson = json.dumps(response)
     return json.dumps(response)
 
