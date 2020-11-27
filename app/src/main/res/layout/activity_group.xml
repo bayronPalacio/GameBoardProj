@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -12,42 +12,79 @@
         android:id="@+id/title_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:layout_marginBottom="15dp"
         android:gravity="center"
         android:text="@string/title_rip"
         android:textColor="@color/titleColor"
         android:textSize="24sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/ripRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:background="#729C60" />
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Enter, Modify, or Vote for a RiP:"
+        app:layout_constraintStart_toStartOf="@+id/ripInputText"
+        app:layout_constraintTop_toBottomOf="@+id/title_group" />
 
     <EditText
         android:id="@+id/ripInputText"
         android:layout_width="match_parent"
         android:layout_height="100dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
         android:background="@color/design_default_color_background"
         android:ems="10"
         android:gravity="start|top"
         android:hint="@string/example_rip"
-        android:inputType="textMultiLine" />
+        android:inputType="textMultiLine"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Current Reasons in Play:"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/vote_rip" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/ripRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="#729C60"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView5" />
 
     <LinearLayout
+        android:id="@+id/linearLayout4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="8dp"
         android:background="@color/backgroundColor"
         android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ripInputText"
         tools:context=".CreateRipActivity">
 
         <Button
             android:id="@+id/create_rip"
             android:layout_width="150dp"
             android:layout_height="40dp"
-            android:layout_margin="5dp"
             android:layout_weight="1"
             android:text="@string/create_rip" />
 
@@ -55,7 +92,6 @@
             android:id="@+id/update_rip"
             android:layout_width="150dp"
             android:layout_height="40dp"
-            android:layout_margin="5dp"
             android:layout_weight="1"
             android:text="@string/update_rip" />
 
@@ -66,8 +102,10 @@
         android:id="@+id/vote_rip"
         android:layout_width="150dp"
         android:layout_height="40dp"
-        android:layout_margin="5dp"
         android:layout_gravity="center"
-        android:text="@string/vote_rip_button" />
+        android:text="@string/vote_rip_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout4" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

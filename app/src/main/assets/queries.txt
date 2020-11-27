@@ -216,13 +216,26 @@ def place_rip_second_vote():
             jsonArrayOfVotesAgainst = item['votesAgainst']
 
     ## have to check if user name is in either votesFor or VotesAgainst - remove if found
-    for x in jsonArrayOfVotesFor:
-        if dataFromUser['currentUser'] in x:
-            jsonArrayOfVotesFor.remove(dataFromUser['currentUser'])
+     for x in jsonArrayOfVotesFor:
+            if dataFromUser['currentUser'] in x:
+                jsonArrayOfVotesFor.remove(dataFromUser['currentUser'])
+                db.rip.update_one(
+                { "rip_statement" : dataFromUser["currentRip"]},
+                { "$set" :
+                    {"votesFor" : jsonArrayOfVotesFor }
 
-    for x in jsonArrayOfVotesAgainst:
-        if dataFromUser['currentUser'] in x:
-            jsonArrayOfVotesAgainst.remove(dataFromUser['currentUser'])
+            })
+
+        for x in jsonArrayOfVotesAgainst:
+            if dataFromUser['currentUser'] in x:
+                jsonArrayOfVotesAgainst.remove(dataFromUser['currentUser'])
+                db.rip.update_one(
+                { "rip_statement" : dataFromUser["currentRip"]},
+                { "$set" :
+                    {"votesAgainst" : jsonArrayOfVotesAgainst }
+
+                })
+
 
     ## if vote is true update votesFor
     if dataFromUser['vote'] == "True":

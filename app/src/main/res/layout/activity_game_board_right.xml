@@ -13,6 +13,7 @@
         android:orientation="vertical">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayoutRightBoardAffirm"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="30dp"
@@ -35,6 +36,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayoutRightBoardRefute"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="30dp"
@@ -103,6 +105,18 @@
                 app:layout_constraintEnd_toStartOf="@+id/textView7"
                 app:layout_constraintStart_toEndOf="@+id/constraintLayoutChangeMCVoteRight"
                 app:layout_constraintTop_toTopOf="@+id/constraintLayoutChangeMCVoteRight" />
+
+            <TextView
+                android:id="@+id/textViewGameBoardSideRight"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:gravity="center"
+                android:text="R"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toEndOf="@+id/textViewTimer"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/constraintLayoutChangeMCVoteRight"

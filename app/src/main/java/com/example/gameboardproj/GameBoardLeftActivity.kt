@@ -27,8 +27,7 @@ import java.io.BufferedReader
  *
  * TODO
  * pressing back should go can be funky if you've switched sides multiple times
- * make changes in DB when voting on Rip
- * Allow MC vote to change
+ * Allow Final MC vote to change when switching sides of board
  * make the UI look nicer?
  * Implement Timer
  * when timer ends go to EndGameActivity
@@ -45,12 +44,17 @@ class GameBoardLeftActivity : AppCompatActivity() {
         sharedPrefFile = this.getSharedPreferences("sharedPreferences", 0);
         var rip = sharedPrefFile.getString("currentRip", "").toString()
         var currentUser = sharedPrefFile.getString("Name", "").toString()
+
+        // Set TextViews - Current Rip, Timer?
         textViewCurrentRipLeft.text = rip
-        Log.d("testing", "The current user is: " + currentUser)
+
         // Access text file query Server
         var fileReader: BufferedReader = application.assets.open("url.txt").bufferedReader()
         var url = fileReader.readLine()
 
+        // Navigate to the Other side of the Board
+        // SnackBar? Confirm user Decision
+        // Update Main Claim Final Vote
         constraintLayoutLeftBoardRips.setOnClickListener{
             startActivity(Intent(this, GameBoardRightActivity::class.java))
         }
@@ -74,13 +78,10 @@ class GameBoardLeftActivity : AppCompatActivity() {
                 myVote,           // What
                 Response.Listener { response ->
                     if (response["responseServer"].toString().equals("VotesFor Updated")) {
-                        Toast.makeText(this, "VotesFor Updated", Toast.LENGTH_SHORT).show()
-                    }
-                    if(response["responseServer"].toString().equals("VotesAgainst Updated")) {
-                        Toast.makeText(this, "VotesAgainst Updated", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Affirm Vote Cast", Toast.LENGTH_SHORT).show()
                     }
                     if(response["responseServer"].toString().equals("Update Failed")) {
-                        Toast.makeText(this, "Update Failed", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Vote Failed", Toast.LENGTH_SHORT).show()
                     }
                 },
                 Response.ErrorListener {
@@ -92,7 +93,36 @@ class GameBoardLeftActivity : AppCompatActivity() {
         }
 
         constraintLayoutRefute.setOnClickListener{
+            // The associated URL path to Server
+            var urlPath = "$url/placeRipVote"
 
+            val myVote = JSONObject()
+            var list = listOf(currentUser)
+            // Follows format - RIP_TABLE (RIP_ID, RIP_STATEMENT ,RIP_SUBMITTED_BY, RIP_VOTE, MC_ID)
+            // unique ID is pre-generated
+            myVote.put("currentRip", textViewCurrentRipLeft.text)
+            myVote.put("currentUser", list)
+            myVote.put("vote", "False")
+
+            val requestQueue = Volley.newRequestQueue(this)
+            val createRequest = JsonObjectRequest(
+                Request.Method.POST,    // How
+                urlPath,                // Where
+                myVote,           // What
+                Response.Listener { response ->
+                    if(response["responseServer"].toString().equals("VotesAgainst Updated")) {
+                        Toast.makeText(this, "Refute Vote Cast", Toast.LENGTH_SHORT).show()
+                    }
+                    if(response["responseServer"].toString().equals("Update Failed")) {
+                        Toast.makeText(this, "Vote Failed", Toast.LENGTH_SHORT).show()
+                    }
+                },
+                Response.ErrorListener {
+                    println("Error from server")
+                }
+            )
+            // put query into request queue and perform
+            requestQueue.add(createRequest)
         }
     }
 }
