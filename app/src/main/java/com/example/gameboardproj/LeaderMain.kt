@@ -118,8 +118,47 @@ class LeaderMain : AppCompatActivity() {
         }
 
         checkVote.setOnClickListener{
-            //val toCheckVote = Intent(this,CheckVoteResults::class.java)
-            //startActivity(toCheckVote)
+            var urlPathGetVotes = "$url/voteMC"
+
+            val requestVotes = JSONObject()
+            requestVotes.put("vote", "getTotalVotes")
+            requestVotes.put("numberOfMembers", 0)
+
+            val queTotalVotes = Volley.newRequestQueue(this)
+            val reqVotes = JsonObjectRequest(
+                Request.Method.POST, urlPathGetVotes, requestVotes,
+                Response.Listener { response ->
+                    totalVotes.text = "Agree votes: " +  response["Agree votes"] + "\nDisagree votes: " + response["Disagree votes"]
+                    println("Response from server -> $response")
+                }, Response.ErrorListener {
+                    println("Error from server")
+                }
+            )
+            queTotalVotes.add(reqVotes)
+        }
+
+        btnCreateGroups.setOnClickListener {
+            if(inputPersonPerGroup.text.toString() == ""){
+                Toast.makeText(this, "Please enter a number of students per group", Toast.LENGTH_LONG).show()
+            }
+            else{
+                var urlPathGetVotes = "$url/voteMC"
+
+                val createGroups = JSONObject()
+                createGroups.put("vote", "getTotalVotes")
+                createGroups.put("numberOfMembers", inputPersonPerGroup.text.toString())
+
+                val queTotalVotes = Volley.newRequestQueue(this)
+                val reqVotes = JsonObjectRequest(
+                    Request.Method.POST, urlPathGetVotes, createGroups,
+                    Response.Listener { response ->
+                        println("Response from server -> $response")
+                    }, Response.ErrorListener {
+                        println("Error from server")
+                    }
+                )
+                queTotalVotes.add(reqVotes)
+            }
         }
     }
 }

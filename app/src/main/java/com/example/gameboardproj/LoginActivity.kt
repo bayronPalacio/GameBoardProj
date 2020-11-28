@@ -64,6 +64,7 @@ class LoginActivity : AppCompatActivity() {
                             Toast.makeText(this, "Welcome " + response["name"] + " " + response["last"], Toast.LENGTH_LONG).show()
                             val editor = sharedPrefFile!!.edit()
                             editor.putString("Name", response["name"].toString() + " " + response["last"].toString())
+                            editor.putString("Email",username.text.toString())
                             //editor.putInt("Role", response["role"] as Int)
                             editor.apply()
                             if(response["role"].toString().equals("0")){

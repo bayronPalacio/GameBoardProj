@@ -7,41 +7,51 @@
     android:background="@color/backgroundColor"
     tools:context=".LeaderMain">
 
+    <Button
+        android:id="@+id/btnCreateGroups"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="26dp"
+        android:text="@string/btn_create_groups"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/inputPersonPerGroup" />
+
     <EditText
         android:id="@+id/setMCEditText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="55dp"
-        android:layout_marginTop="197dp"
+        android:layout_marginTop="20dp"
         android:layout_marginEnd="55dp"
-        android:layout_marginBottom="196dp"
         android:ems="10"
         android:hint="@string/setmc"
         android:inputType="textPersonName"
         android:textSize="24sp"
-        app:layout_constraintBottom_toTopOf="@+id/checkVote"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
     <Button
         android:id="@+id/setMCBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="282dp"
-        android:layout_marginBottom="33dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
         android:text="@string/confirm"
         app:layout_constraintBottom_toTopOf="@+id/checkVote"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/setMCEditText" />
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="72dp"
+        android:layout_marginTop="20dp"
         android:layout_marginBottom="627dp"
         android:text="@string/mcTitle"
         android:textColor="@color/titleColor"
@@ -56,25 +66,22 @@
         android:id="@+id/checkVote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="363dp"
-        android:layout_marginBottom="320dp"
+        android:layout_marginTop="30dp"
         android:text="@string/checkVote"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/setMCBtn" />
 
     <Button
         android:id="@+id/startScrimmage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="44dp"
-        android:layout_marginBottom="227dp"
+        android:layout_marginTop="18dp"
         android:text="@string/startScrimmage"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/checkVote" />
+        app:layout_constraintTop_toBottomOf="@+id/btnCreateGroups" />
 
     <EditText
         android:id="@+id/timer"
@@ -82,14 +89,13 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="108dp"
         android:layout_marginTop="22dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="160dp"
+        android:layout_marginEnd="90dp"
         android:ems="10"
         android:gravity="center"
         android:inputType="time"
         android:text="@string/timer"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/startScrimmage"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/startScrimmage" />
 
@@ -97,11 +103,36 @@
         android:id="@+id/endScrimmage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="33dp"
-        android:layout_marginBottom="79dp"
+        android:layout_marginTop="23dp"
+        android:layout_marginBottom="32dp"
         android:text="@string/endScrimmage"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/timer" />
+
+    <TextView
+        android:id="@+id/totalVotes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/checkVote" />
+
+    <EditText
+        android:id="@+id/inputPersonPerGroup"
+        android:layout_width="300dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="105dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="93dp"
+        android:ems="10"
+        android:hint="@string/person_per_group"
+        android:inputType="number"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/totalVotes" />
 </androidx.constraintlayout.widget.ConstraintLayout>

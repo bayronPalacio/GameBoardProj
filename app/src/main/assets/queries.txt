@@ -292,6 +292,8 @@ def get_rip_second_vote():
 def add_mc():
     dataFromMc = request.get_json(force=True)
     if db.mainclaim.count() <= 0:
+        #remove previous votes
+        db.voteMC.delete_many({})
         db.mainclaim.insert_one({'mc':dataFromMc['mc']})
         print("Mc has been created")
         response = {'responseServer': 'Yes'}
@@ -299,6 +301,8 @@ def add_mc():
         return responseToJson
     else:
         print("Mc will be updated")
+        #remove previous votes
+        db.voteMC.delete_many({})
         cursor = db.mainclaim.find({})
         for document in cursor:
             print(document['_id'])
@@ -313,6 +317,7 @@ def add_mc():
         return responseToJson
 
 
+#Get MC
 @app.route('/getMC',methods=['GET'])
 def get_mc():
     if db.mainclaim.count() > 0:
@@ -322,7 +327,81 @@ def get_mc():
             mainClaim = originalMC['mc']
         return mainClaim
     else:
-        return "NoMC"
+        return "MC has not been found"
+
+#Vote MC and create groups
+@app.route('/voteMC',methods=['POST'])
+def mc_vote():
+    voteFromUser = request.get_json(force=True)
+    if voteFromUser['vote'] == 'Agree':
+        print('agree vote')
+        db.voteMC.insert_one({'user':voteFromUser['student'],'vote':voteFromUser['vote']})
+        response = {'responseServer': 'Agree'}
+        responseToJson = json.dumps(response)
+        return responseToJson
+    elif voteFromUser['vote'] == 'Disagree':
+        print('disagree vote')
+        db.voteMC.insert_one({'user':voteFromUser['student'],'vote':voteFromUser['vote']})
+        response = {'responseServer': 'Disagree'}
+        responseToJson = json.dumps(response)
+        return responseToJson
+    elif voteFromUser['vote'] == 'getTotalVotes':
+        cursor = db.voteMC.find({})
+        agreeVote = 0
+        disagreeVote = 0
+        agreeStudents = []
+        disagreeStudents = []
+        for vote in cursor:
+            if vote['vote'] == 'Agree':
+                agreeVote = agreeVote + 1
+                agreeStudents.append(vote['user'])
+            else:
+                disagreeVote = disagreeVote + 1
+                disagreeStudents.append(vote['user'])
+        totalVotes = agreeVote + disagreeVote
+        print(totalVotes)
+        print(agreeStudents)
+        print(disagreeStudents)
+        studentsGroup = []
+        for index in range(totalVotes):
+            agreeLenght = len(agreeStudents)
+            disagreeLenght = len(disagreeStudents)
+            if (agreeLenght >= 1):
+                studentsGroup.append(agreeStudents.pop())
+            if (disagreeLenght >= 1):
+                studentsGroup.append((disagreeStudents.pop()))
+        print(studentsGroup)
+        print(voteFromUser)
+        members = int(voteFromUser['numberOfMembers'])
+        if(members > 0):
+            print(voteFromUser['numberOfMembers'])
+            groupNumber = 0
+            for count in range(len(studentsGroup)):
+                if(count % members == 0):
+                    groupNumber = groupNumber + 1
+                print(studentsGroup[count] + " belongs to group -> " + str(groupNumber))
+                db.user.update_one(
+                    { "Email" : studentsGroup[count]},
+                    { "$set" : {"groupNumber" : groupNumber }
+                    })
+        response = {'Agree votes': agreeVote,'Disagree votes': disagreeVote}
+        responseToJson = json.dumps(response)
+        return responseToJson
+
+#Get group Number
+@app.route('/groupNumber',methods=['POST'])
+def group():
+    userEmail = request.get_json(force=True)
+    if db.user.find({'Email' : userEmail['Email']}).count() <=0:
+        print("User does not exist")
+        responseGroup = {'responseGroup': 'User does not exist'}
+        responseGroupToJson = json.dumps(responseGroup)
+        return responseGroupToJson
+    else:
+        user = db.user.find_one({'Email' : userEmail['Email']})
+        responseGroup = {'responseGroup': user['groupNumber']}
+        responseGroupToJson = json.dumps(responseGroup)
+        return responseGroupToJson
 
 @app.route('/setTime',methods=['POST'])
 def set_time():
