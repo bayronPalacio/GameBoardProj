@@ -108,9 +108,10 @@
         android:text="@string/endScrimmage"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/timer" />
+        app:layout_constraintTop_toBottomOf="@+id/timer"
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/totalVotes"
@@ -135,4 +136,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/totalVotes" />
+
+    <Button
+        android:id="@+id/checkResults"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/check_result"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/endScrimmage" />
 </androidx.constraintlayout.widget.ConstraintLayout>

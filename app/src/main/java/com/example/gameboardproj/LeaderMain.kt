@@ -1,6 +1,7 @@
 package com.example.gameboardproj
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.widget.Toast
@@ -14,6 +15,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_leader_main.*
+import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_registration.*
 import org.json.JSONObject
 import java.io.BufferedReader
@@ -27,9 +29,13 @@ class LeaderMain : AppCompatActivity() {
     private var dataBaseGame: GameDatabase? = null
     private var mainclaimDao: MainClaimDao? = null
 
+    private var sharedPrefFile : SharedPreferences? = null;
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_leader_main)
+
+        sharedPrefFile = this.getSharedPreferences("sharedPreferences", 0);
 
         var fileReader: BufferedReader = application.assets.open("url.txt").bufferedReader()
         var url = fileReader.readLine()
@@ -77,6 +83,8 @@ class LeaderMain : AppCompatActivity() {
         }
 
 
+        val editor = sharedPrefFile!!.edit()
+
 
         var time = timer.text.toString().toLong()
         var urlPath = "$url/setTime"
@@ -87,6 +95,9 @@ class LeaderMain : AppCompatActivity() {
                 timer.setText(time.toString())
                 newTime.put("time", time)
 
+                editor.putString("timeLeft", time.toString())
+                editor.apply()
+
                 val que = Volley.newRequestQueue(applicationContext)
                 val req = JsonObjectRequest(
                     Request.Method.POST, urlPath, newTime,
@@ -95,7 +106,7 @@ class LeaderMain : AppCompatActivity() {
                             Toast.makeText(applicationContext, "Time has been created", Toast.LENGTH_LONG).show()
                         }
                         else if(response["responseServer"].toString().equals("Updated")){
-                            Toast.makeText(applicationContext, "Time has been updated", Toast.LENGTH_LONG).show()
+                            //Toast.makeText(applicationContext, "Time has been updated", Toast.LENGTH_LONG).show()
                         }
                         println("Response from server -> " + response["responseServer"])
                     }, Response.ErrorListener {
@@ -159,6 +170,11 @@ class LeaderMain : AppCompatActivity() {
                 )
                 queTotalVotes.add(reqVotes)
             }
+        }
+
+        checkResults.setOnClickListener {
+            val toEndGame = Intent(this,CheckRipVoteResults::class.java)
+            startActivity(toEndGame)
         }
     }
 }

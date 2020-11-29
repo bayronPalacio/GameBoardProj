@@ -4,14 +4,13 @@ import android.content.Intent
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
+import android.os.CountDownTimer
 import android.widget.Toast
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import kotlinx.android.synthetic.main.activity_game_board_left.*
-import kotlinx.android.synthetic.main.activity_group.*
 import kotlinx.android.synthetic.main.activity_user_main.*
 import org.json.JSONObject
 import java.io.BufferedReader
@@ -71,6 +70,16 @@ class GameBoardLeftActivity : AppCompatActivity() {
         constraintLayoutRefute.setOnClickListener {
             castRipRefuteVote(currentUser)
         }
+
+        val timer = object: CountDownTimer(500*1000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+
+                var timeLeft = sharedPrefFile.getString("timeLeft", "").toString()
+                textViewTimerInLeft.setText(timeLeft)
+            }
+            override fun onFinish() {}
+        }
+        timer.start()
     }
 
     private fun castRipRefuteVote(currentUser : String){

@@ -3,6 +3,7 @@ package com.example.gameboardproj
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -22,6 +23,7 @@ import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import kotlinx.android.synthetic.main.activity_check_vote_result.*
 
 /**
  * @author Daniel Cooper
@@ -79,6 +81,15 @@ class CreateRipActivity : AppCompatActivity() {
         for(entity in array){
             Log.d("testing", entity.toString())
         }
+
+        val timer = object: CountDownTimer(500*1000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                var timeLeft = sharedPrefFile.getString("timeLeft", "").toString()
+                timeLeftInCreateRip.setText(timeLeft)
+            }
+            override fun onFinish() {}
+        }
+        timer.start()
 
         create_rip.setOnClickListener {
             // If ReasonInPlay Input has text
