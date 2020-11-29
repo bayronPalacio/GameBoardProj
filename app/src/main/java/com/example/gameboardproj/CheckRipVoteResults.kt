@@ -3,7 +3,6 @@ package com.example.gameboardproj
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -19,7 +18,7 @@ import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import kotlinx.android.synthetic.main.activity_check_vote_result.*
-import kotlinx.android.synthetic.main.activity_leader_main.*
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.BufferedReader
 
@@ -63,6 +62,7 @@ class CheckRipVoteResults : AppCompatActivity() {
         }
 
         buttonToGame.setOnClickListener{
+            val editor = sharedPrefFile!!.edit()
             // count votes
             var totalVotes = 0
             var winningRip : RiP
@@ -86,7 +86,6 @@ class CheckRipVoteResults : AppCompatActivity() {
                 Response.Listener { response ->
                     var rip : String = response["rip_statement"] as String
                     println(rip.toString())
-                    val editor = sharedPrefFile!!.edit()
                     editor.putString("currentRip", rip)
                     editor.apply()
                 },
@@ -107,19 +106,9 @@ class CheckRipVoteResults : AppCompatActivity() {
                 else
                     startActivity(Intent(this, GameBoardLeftActivity::class.java))
             }
+
+            getMCVoteData(url, editor)
         }
-
-        val timer = object: CountDownTimer(500*1000, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-
-                var timeLeft = sharedPrefFile.getString("timeLeft", "").toString()
-                timeLeftInCheckVOte.setText(timeLeft)
-            }
-            override fun onFinish() {}
-        }
-        timer.start()
-
-
     }
 
     private fun getRips(url: String, listOfRips: ArrayList<RiP>): Array<RiP> {
@@ -168,6 +157,63 @@ class CheckRipVoteResults : AppCompatActivity() {
         return array
     }
 
+    private fun getMCVoteData(url: String, editor :SharedPreferences.Editor){
+        var urlPath = "$url/getFinalMCVote"
+
+        var listOfVotes: ArrayList<FinalVoteData> = ArrayList<FinalVoteData>()
+        var userEmail = sharedPrefFile.getString("Email", "").toString()
+
+        val user = JSONArray()
+        user.put(0, userEmail)
+
+        // Follows format - RIP_TABLE (RIP_ID, RIP_STATEMENT ,RIP_SUBMITTED_BY, RIP_VOTE, MC_ID)
+        val requestQueue = Volley.newRequestQueue(this)
+        val getRequest = JsonArrayRequest(
+            Request.Method.POST,    // How
+            urlPath,
+            user,// What
+            { response ->
+                for (i in 0 until response.length()) {
+                    // now hold a string of the object
+                    Log.d("testing", response[i].toString())
+
+                    var entity = response[i].toString()
+
+                    var splitString = entity.split(",", ":")
+
+                    val email = splitString[1].filterNot { it == '"' }.trim()
+                    val name = splitString[3].filterNot { it == '"' }.trim()
+                    val vote = splitString[5].filterNot { it == '"' }.dropLast(1).trim()
+
+                    Log.d("testing", email + " " + name + ' ' + vote)
+                    var entry : FinalVoteData = FinalVoteData(email, name, vote)
+                    listOfVotes.add(entry)
+                }
+
+                var forList = ""
+                var AgainstList = ""
+
+                for (i in 0 until listOfVotes.size) {
+                    var vote = listOfVotes[i].vote
+                    if (vote == "Agree") {
+                        forList += "$vote/"
+                    }
+                    if (vote == "Disagree") {
+                        forList += "$AgainstList/"
+                    }
+                }
+
+                editor.putString("forList", forList)
+                editor.putString("againstList", AgainstList)
+            },
+            {
+                println(it.toString())
+            }
+        )
+        // put query into request queue and perform
+        requestQueue.add(getRequest)
+    }
+
 
     class ResultAdapter(private val dataSet: Array<RiP>) :
         RecyclerView.Adapter<ResultAdapter.ViewHolder>() {
@@ -208,4 +254,9 @@ class CheckRipVoteResults : AppCompatActivity() {
             return "RiP(ripID='$ripID', ripStatement='$ripStatement', ripSubmittedBy=$ripSubmittedBy, ripVote=$ripVote, ripMainClaimID=$ripMainClaimStatement)"
         }
     }
+
+    // MC Table follows this Structure... ?
+    data class FinalVoteData constructor(val email : String,
+                                         val name : String,
+                                         val vote : String)
 }

@@ -4,7 +4,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.widget.Toast
 import com.android.volley.Request
 import com.android.volley.Response
@@ -27,8 +26,6 @@ import java.io.BufferedReader
  *
  * TODO
  * pressing back should go can be funky if you've switched sides multiple times
- * Allow Final MC vote to change when switching sides of board
- * make the UI look nicer?
  * Implement Timer
  * when timer ends go to EndGameActivity
  */
@@ -38,27 +35,31 @@ class GameBoardLeftActivity : AppCompatActivity() {
     private lateinit var sharedPrefFile : SharedPreferences
     var url = ""
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game_board_left)
 
         sharedPrefFile = this.getSharedPreferences("sharedPreferences", 0);
+        val editor =  sharedPrefFile!!.edit()
         var rip = sharedPrefFile.getString("currentRip", "").toString()
         var currentUser = sharedPrefFile.getString("Name", "").toString()
         var userEmail = sharedPrefFile.getString("Email", "").toString()
 
         // Set TextViews - Current Rip, Timer?
-        textViewCurrentRipLeft.text = rip
+        textViewGameLeftRIP.setText(rip)
 
         // Access text file query Server
         var fileReader: BufferedReader = application.assets.open("url.txt").bufferedReader()
         url = fileReader.readLine()
 
         // Navigate to the Other side of the Board
-        // SnackBar? Confirm user Decision
-        constraintLayoutLeftBoardRips.setOnClickListener {
+        buttonGameLeftChangeMC.setOnClickListener {
             // Change Main Claim Vote to Agree
             castMCVote("Agree", userEmail)
+            // save rip that changed users mind
+            editor.putString("ripThatChangeUserMind", rip)
+            editor.apply()
             // Switch Boards
             startActivity(Intent(this, GameBoardRightActivity::class.java))
         }
@@ -71,15 +72,36 @@ class GameBoardLeftActivity : AppCompatActivity() {
             castRipRefuteVote(currentUser)
         }
 
-        val timer = object: CountDownTimer(500*1000, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-
-                var timeLeft = sharedPrefFile.getString("timeLeft", "").toString()
-                textViewTimerInLeft.setText(timeLeft)
-            }
-            override fun onFinish() {}
+        // If users no longer wish to discuss current Rip - move back to Rip Selection
+        buttonGameLeftEndRound.setOnClickListener{
+            endRound(userEmail)
+            startActivity(Intent(this, CreateRipActivity::class.java))
         }
-        timer.start()
+    }
+
+    private fun endRound(userEmail: String){
+        // The associated URL path to Server
+        var urlPath = "$url/resetRipVote"
+
+        val user = JSONObject()
+        user.put("userEmail", userEmail)
+
+        val requestQueue = Volley.newRequestQueue(this)
+        val createRequest = JsonObjectRequest(
+            Request.Method.PUT,    // How
+            urlPath,                // Where
+            user,           // What
+            Response.Listener { response ->
+                if(response["responseServer"].toString().equals("Rip Vote Tallies have been reset")) {
+                    Toast.makeText(this, "RiP Votes reset", Toast.LENGTH_SHORT).show()
+                }
+            },
+            Response.ErrorListener {
+                println("Error from server")
+            }
+        )
+        // put query into request queue and perform
+        requestQueue.add(createRequest)
     }
 
     private fun castRipRefuteVote(currentUser : String){
@@ -90,7 +112,7 @@ class GameBoardLeftActivity : AppCompatActivity() {
         var list = listOf(currentUser)
         // Follows format - RIP_TABLE (RIP_ID, RIP_STATEMENT ,RIP_SUBMITTED_BY, RIP_VOTE, MC_ID)
         // unique ID is pre-generated
-        myVote.put("currentRip", textViewCurrentRipLeft.text)
+        myVote.put("currentRip", textViewGameLeftRIP.text)
         myVote.put("currentUser", list)
         myVote.put("vote", "False")
 
@@ -123,7 +145,7 @@ class GameBoardLeftActivity : AppCompatActivity() {
         var list = listOf(currentUser)
         // Follows format - RIP_TABLE (RIP_ID, RIP_STATEMENT ,RIP_SUBMITTED_BY, RIP_VOTE, MC_ID)
         // unique ID is pre-generated
-        myVote.put("currentRip", textViewCurrentRipLeft.text)
+        myVote.put("currentRip", textViewGameLeftRIP.text)
         myVote.put("currentUser", list)
         myVote.put("vote", "True")
 
