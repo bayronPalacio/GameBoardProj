@@ -173,6 +173,37 @@ def select_rip():
         responseToJson = json.dumps(response)
         return responseToJson
 
+## reset all Rip Votes
+@app.route('/resetRipVote', methods=['PUT'])
+def reset_rip_votes():
+    ## find current user's group
+    dataFromUser = request.get_json(force=True)
+    cursor = db.user.find({})
+    for x in cursor:
+        if(x['Email'] == dataFromUser["userEmail"]):
+            groupNumber = x['groupNumber']
+
+    ## Get all members in group
+    groupMembers = []
+    for member in db.user.find( {"groupNumber": groupNumber}):
+        name = member['Name'] + " " + member['Last']
+        groupMembers.append(name)
+        print(name)
+
+    ## find rips created by group members - set votes to 0
+    collection = db['rip']
+    for member in groupMembers:
+        for doc in collection.find({'rip_submitted_by': member}):
+            db.rip.update_one(
+                { "rip_statement" : doc["rip_statement"]},
+                { "$set" :
+                    {"rip_vote" : 0 }
+                })
+
+    response = {'responseServer': 'Rip Vote Tallies have been reset'}
+    responseToJson = json.dumps(response)
+    return responseToJson
+
 ## returns the rip with the most votes and its statement
 @app.route('/findWinningRip', methods=['GET'])
 def select_winning_rip():
@@ -216,26 +247,25 @@ def place_rip_second_vote():
             jsonArrayOfVotesAgainst = item['votesAgainst']
 
     ## have to check if user name is in either votesFor or VotesAgainst - remove if found
-     for x in jsonArrayOfVotesFor:
-            if dataFromUser['currentUser'] in x:
-                jsonArrayOfVotesFor.remove(dataFromUser['currentUser'])
-                db.rip.update_one(
-                { "rip_statement" : dataFromUser["currentRip"]},
-                { "$set" :
-                    {"votesFor" : jsonArrayOfVotesFor }
+    for x in jsonArrayOfVotesFor:
+        if dataFromUser['currentUser'] in x:
+            jsonArrayOfVotesFor.remove(dataFromUser['currentUser'])
+            db.rip.update_one(
+            { "rip_statement" : dataFromUser["currentRip"]},
+            { "$set" :
+                {"votesFor" : jsonArrayOfVotesFor }
+
+        })
+
+    for x in jsonArrayOfVotesAgainst:
+        if dataFromUser['currentUser'] in x:
+            jsonArrayOfVotesAgainst.remove(dataFromUser['currentUser'])
+            db.rip.update_one(
+            { "rip_statement" : dataFromUser["currentRip"]},
+            { "$set" :
+                {"votesAgainst" : jsonArrayOfVotesAgainst }
 
             })
-
-        for x in jsonArrayOfVotesAgainst:
-            if dataFromUser['currentUser'] in x:
-                jsonArrayOfVotesAgainst.remove(dataFromUser['currentUser'])
-                db.rip.update_one(
-                { "rip_statement" : dataFromUser["currentRip"]},
-                { "$set" :
-                    {"votesAgainst" : jsonArrayOfVotesAgainst }
-
-                })
-
 
     ## if vote is true update votesFor
     if dataFromUser['vote'] == "True":
@@ -428,6 +458,38 @@ def set_time():
         return responseToJson
 
 
+#Get group Number
+@app.route('/getFinalMCVote', methods=['POST'])
+def get_final_mc_vote():
+    ## find current user's group
+    dataFromUser = request.get_json(force=True)
+    cursor = db.user.find({})
+    for x in cursor:
+        if(x['Email'] == dataFromUser[0]):
+            groupNumber = x['groupNumber']
+
+    ## Get all members in group
+    groupMembers = []
+    for member in db.user.find( {"groupNumber": groupNumber}):
+        email = member['Email']
+        name = member['Name'] + " " + member['Last']
+        groupMembers.append({'email' : email, 'name' : name})
+
+    collection = db['voteMC']
+    vote = []
+    for x in groupMembers:
+        for doc in collection.find({'user': x['email']}):
+            vote.append(doc['vote'])
+
+    i = 0
+    while i < len(groupMembers):
+        groupMembers[i].update({'vote' : vote[i]})
+        i += 1
+
+    response = {'responseServer': 'Rip Vote Tallies have been reset'}
+    responseToJson = json.dumps(response)
+    print(groupMembers)
+    return json.dumps(groupMembers)
 
 
 

@@ -48,6 +48,20 @@
     -->
     <string name="hello_world">Hello Square World!</string>
     <string name="end_game">End Game</string>
-
+    <string name="initial_vote">Initial Vote</string>
+    <string name="trues">True</string>
+    <string name="falses">False</string>
+    <string name="final_vote">Final Vote</string>
+    <string name="main_claim_goes_here">Main Claim Goes Here</string>
+    <string name="affirm">Affirm</string>
+    <string name="refute">Refute</string>
+    <string name="mc_false">MC FALSE</string>
+    <string name="Left">L</string>
+    <string name="current_reason_in_play">Current Reason In Play</string>
+    <string name="update">Update</string>
+    <string name="end_round">End Round</string>
+    <string name="change_mc_vote">Change MC Vote</string>
+    <string name="mc_true">MC TRUE</string>
+    <string name="Right">R</string>
 
 </resources>

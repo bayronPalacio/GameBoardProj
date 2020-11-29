@@ -9,7 +9,6 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-import kotlinx.android.synthetic.main.activity_game_board_left.*
 import kotlinx.android.synthetic.main.activity_game_board_right.*
 import kotlinx.android.synthetic.main.activity_user_main.*
 import org.json.JSONObject
@@ -27,8 +26,6 @@ import java.io.BufferedReader
  *
  * TODO
  * pressing back should go can be funky if you've switched sides multiple times
- * Allow Final MC vote to change when switching sides of board
- * make the UI look nicer?
  * Implement Timer?
  * when timer ends go to EndGameActivity
  *
@@ -42,20 +39,27 @@ class GameBoardRightActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game_board_right)
 
+        // Shared Preferences
         sharedPrefFile = this.getSharedPreferences("sharedPreferences", 0);
+        val editor =  sharedPrefFile!!.edit()
+        // Get Shared Preferences Data
         var rip = sharedPrefFile.getString("currentRip", "").toString()
         var currentUser = sharedPrefFile.getString("Name", "").toString()
         var userEmail = sharedPrefFile.getString("Email", "").toString()
+
         // Set the TextView text - Rip, timer
-        textViewCurrentRipRight.text = rip
+        textViewGameRightRIP.setText(rip)
 
         // Access text file query Server
         var fileReader: BufferedReader = application.assets.open("url.txt").bufferedReader()
         var url = fileReader.readLine()
 
-        constraintLayoutChangeMCVoteRight.setOnClickListener{
+        buttonGameRightChangeMC.setOnClickListener{
             // Change Main Claim Vote to Agree
             castMCVote("Disagree", userEmail)
+            // save rip that changed users mind
+            editor.putString("ripThatChangeUserMind", rip)
+            editor.apply()
             // Switch Boards
             startActivity(Intent(this, GameBoardLeftActivity::class.java))
         }
@@ -67,6 +71,34 @@ class GameBoardRightActivity : AppCompatActivity() {
         constraintLayoutRightBoardRefute.setOnClickListener {
             castRipRefuteVote(currentUser)
         }
+
+        // If users no longer wish to discuss current Rip - move back to Rip Selection
+        buttonGameRightEndRound.setOnClickListener{
+            endRound()
+            startActivity(Intent(this, CreateRipActivity::class.java))
+        }
+    }
+
+    private fun endRound(){
+        // The associated URL path to Server
+        var urlPath = "$url/resetRipVote"
+
+        val requestQueue = Volley.newRequestQueue(this)
+        val createRequest = JsonObjectRequest(
+            Request.Method.GET,    // How
+            urlPath,                // Where
+            null,           // What
+            Response.Listener { response ->
+                if(response["responseServer"].toString().equals("Rip Vote Tallies have been reset")) {
+                    Toast.makeText(this, "RiP Votes reset", Toast.LENGTH_SHORT).show()
+                }
+            },
+            Response.ErrorListener {
+                println("Error from server")
+            }
+        )
+        // put query into request queue and perform
+        requestQueue.add(createRequest)
     }
 
     private fun castRipRefuteVote(currentUser : String){
@@ -77,7 +109,7 @@ class GameBoardRightActivity : AppCompatActivity() {
         var list = listOf(currentUser)
         // Follows format - RIP_TABLE (RIP_ID, RIP_STATEMENT ,RIP_SUBMITTED_BY, RIP_VOTE, MC_ID)
         // unique ID is pre-generated
-        myVote.put("currentRip", textViewCurrentRipLeft.text)
+        myVote.put("currentRip", textViewGameRightRIP.text)
         myVote.put("currentUser", list)
         myVote.put("vote", "False")
 
@@ -110,7 +142,7 @@ class GameBoardRightActivity : AppCompatActivity() {
         var list = listOf(currentUser)
         // Follows format - RIP_TABLE (RIP_ID, RIP_STATEMENT ,RIP_SUBMITTED_BY, RIP_VOTE, MC_ID)
         // unique ID is pre-generated
-        myVote.put("currentRip", textViewCurrentRipLeft.text)
+        myVote.put("currentRip", textViewGameRightRIP.text)
         myVote.put("currentUser", list)
         myVote.put("vote", "True")
 

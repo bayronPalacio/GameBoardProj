@@ -30,7 +30,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
-                android:text="Affirm"
+                android:text="@string/affirm"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -53,7 +53,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
-                android:text="Refute"
+                android:text="@string/refute"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -86,41 +86,30 @@
                 android:id="@+id/textView7"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
-                android:text="MC FALSE"
+                android:text="@string/mc_false"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                android:textColor="#F44336"
+                android:textSize="22sp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintStart_toStartOf="parent" />
 
             <TextView
                 android:id="@+id/textViewTimer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="TIMER"
+                android:text="@string/timer"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/textViewCurrentRipLeft"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="Current Rip"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-                app:layout_constraintBottom_toBottomOf="@+id/constraintLayoutLeftBoardRips"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/constraintLayoutLeftBoardRips" />
-
-            <TextView
                 android:id="@+id/textViewGameBoardSideLeft"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:gravity="center"
-                android:text="L"
+                android:text="@string/Left"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
                 android:textColor="#F44336"
                 app:layout_constraintEnd_toStartOf="@+id/textViewTimer"
@@ -130,35 +119,62 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/constraintLayoutLeftBoardRips"
-                android:layout_width="0dp"
+                android:layout_width="200dp"
                 android:layout_height="200dp"
-                android:layout_margin="8dp"
                 android:background="#FFEB3B"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/textViewCurrentRipLeft"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@+id/textView7"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.499">
 
                 <TextView
-                    android:id="@+id/textViewChangeMCToTrue"
+                    android:id="@+id/textViewGameLeftRIP"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:layout_margin="8dp"
+                    android:ems="10"
                     android:gravity="center"
+                    android:inputType="textPersonName"
                     android:padding="5dp"
-                    android:text="Change MC Vote"
-                    android:textAllCaps="false"
+                    android:text="@string/current_reason_in_play"
                     android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/buttonGameLeftUpdateRIP"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_bias="0.0" />
 
+                <Button
+                    android:id="@+id/buttonGameLeftUpdateRIP"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/update"
+                    android:visibility="invisible"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <Button
+                    android:id="@+id/buttonGameLeftEndRound"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/end_round"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/buttonGameLeftUpdateRIP"
+                    tools:visibility="visible" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <Button
+                android:id="@+id/buttonGameLeftChangeMC"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="@string/change_mc_vote"
+                app:layout_constraintBottom_toBottomOf="@+id/constraintLayoutLeftBoardRips"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/constraintLayoutLeftBoardRips"
+                app:layout_constraintVertical_bias="0.499" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

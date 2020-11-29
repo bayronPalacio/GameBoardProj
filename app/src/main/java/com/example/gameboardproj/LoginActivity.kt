@@ -86,8 +86,6 @@ class LoginActivity : AppCompatActivity() {
                     }
                 )
                 que.add(req)
-//                val login = Intent(this, CreateRipActivity::class.java)
-//                startActivity(login)
             }
         }
 
