@@ -95,9 +95,14 @@ class UserMain : AppCompatActivity() {
                 }
             )
             que.add(req)
-
-//            val toCreateRipScreen = Intent(this, CreateRipActivity::class.java)
-//            startActivity(toCreateRipScreen)
+            if(sharedPrefFile?.getString("Group Number", " ") == " "){
+                Toast.makeText(this, "Waiting for Group to be created", Toast.LENGTH_SHORT).show()
+            }
+            else{
+                // Move to Rip Creation
+                val toCreateRipScreen = Intent(this, CreateRipActivity::class.java)
+                startActivity(toCreateRipScreen)
+            }
         }
     }
 

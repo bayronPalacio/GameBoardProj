@@ -12,6 +12,7 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import kotlinx.android.synthetic.main.activity_game_board_left.*
 import kotlinx.android.synthetic.main.activity_group.*
+import kotlinx.android.synthetic.main.activity_user_main.*
 import org.json.JSONObject
 import java.io.BufferedReader
 
@@ -36,6 +37,7 @@ import java.io.BufferedReader
 class GameBoardLeftActivity : AppCompatActivity() {
 
     private lateinit var sharedPrefFile : SharedPreferences
+    var url = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,85 +46,124 @@ class GameBoardLeftActivity : AppCompatActivity() {
         sharedPrefFile = this.getSharedPreferences("sharedPreferences", 0);
         var rip = sharedPrefFile.getString("currentRip", "").toString()
         var currentUser = sharedPrefFile.getString("Name", "").toString()
+        var userEmail = sharedPrefFile.getString("Email", "").toString()
 
         // Set TextViews - Current Rip, Timer?
         textViewCurrentRipLeft.text = rip
 
         // Access text file query Server
         var fileReader: BufferedReader = application.assets.open("url.txt").bufferedReader()
-        var url = fileReader.readLine()
+        url = fileReader.readLine()
 
         // Navigate to the Other side of the Board
         // SnackBar? Confirm user Decision
-        // Update Main Claim Final Vote
-        constraintLayoutLeftBoardRips.setOnClickListener{
+        constraintLayoutLeftBoardRips.setOnClickListener {
+            // Change Main Claim Vote to Agree
+            castMCVote("Agree", userEmail)
+            // Switch Boards
             startActivity(Intent(this, GameBoardRightActivity::class.java))
         }
 
-        constraintLayoutAffirm.setOnClickListener{
-            // The associated URL path to Server
-            var urlPath = "$url/placeRipVote"
-
-            val myVote = JSONObject()
-            var list = listOf(currentUser)
-            // Follows format - RIP_TABLE (RIP_ID, RIP_STATEMENT ,RIP_SUBMITTED_BY, RIP_VOTE, MC_ID)
-            // unique ID is pre-generated
-            myVote.put("currentRip", textViewCurrentRipLeft.text)
-            myVote.put("currentUser", list)
-            myVote.put("vote", "True")
-
-            val requestQueue = Volley.newRequestQueue(this)
-            val createRequest = JsonObjectRequest(
-                Request.Method.POST,    // How
-                urlPath,                // Where
-                myVote,           // What
-                Response.Listener { response ->
-                    if (response["responseServer"].toString().equals("VotesFor Updated")) {
-                        Toast.makeText(this, "Affirm Vote Cast", Toast.LENGTH_SHORT).show()
-                    }
-                    if(response["responseServer"].toString().equals("Update Failed")) {
-                        Toast.makeText(this, "Vote Failed", Toast.LENGTH_SHORT).show()
-                    }
-                },
-                Response.ErrorListener {
-                    println("Error from server")
-                }
-            )
-            // put query into request queue and perform
-            requestQueue.add(createRequest)
+        constraintLayoutAffirm.setOnClickListener {
+            castRipAffirmVote(currentUser)
         }
 
-        constraintLayoutRefute.setOnClickListener{
-            // The associated URL path to Server
-            var urlPath = "$url/placeRipVote"
-
-            val myVote = JSONObject()
-            var list = listOf(currentUser)
-            // Follows format - RIP_TABLE (RIP_ID, RIP_STATEMENT ,RIP_SUBMITTED_BY, RIP_VOTE, MC_ID)
-            // unique ID is pre-generated
-            myVote.put("currentRip", textViewCurrentRipLeft.text)
-            myVote.put("currentUser", list)
-            myVote.put("vote", "False")
-
-            val requestQueue = Volley.newRequestQueue(this)
-            val createRequest = JsonObjectRequest(
-                Request.Method.POST,    // How
-                urlPath,                // Where
-                myVote,           // What
-                Response.Listener { response ->
-                    if(response["responseServer"].toString().equals("VotesAgainst Updated")) {
-                        Toast.makeText(this, "Refute Vote Cast", Toast.LENGTH_SHORT).show()
-                    }
-                    if(response["responseServer"].toString().equals("Update Failed")) {
-                        Toast.makeText(this, "Vote Failed", Toast.LENGTH_SHORT).show()
-                    }
-                },
-                Response.ErrorListener {
-                    println("Error from server")
-                }
-            )
-            // put query into request queue and perform
-            requestQueue.add(createRequest)
+        constraintLayoutRefute.setOnClickListener {
+            castRipRefuteVote(currentUser)
         }
+    }
+
+    private fun castRipRefuteVote(currentUser : String){
+        // The associated URL path to Server
+        var urlPath = "$url/placeRipVote"
+
+        val myVote = JSONObject()
+        var list = listOf(currentUser)
+        // Follows format - RIP_TABLE (RIP_ID, RIP_STATEMENT ,RIP_SUBMITTED_BY, RIP_VOTE, MC_ID)
+        // unique ID is pre-generated
+        myVote.put("currentRip", textViewCurrentRipLeft.text)
+        myVote.put("currentUser", list)
+        myVote.put("vote", "False")
+
+        val requestQueue = Volley.newRequestQueue(this)
+        val createRequest = JsonObjectRequest(
+            Request.Method.POST,    // How
+            urlPath,                // Where
+            myVote,           // What
+            Response.Listener { response ->
+                if(response["responseServer"].toString().equals("VotesAgainst Updated")) {
+                    Toast.makeText(this, "Refute Vote Cast", Toast.LENGTH_SHORT).show()
+                }
+                if(response["responseServer"].toString().equals("Update Failed")) {
+                    Toast.makeText(this, "Vote Failed", Toast.LENGTH_SHORT).show()
+                }
+            },
+            Response.ErrorListener {
+                println("Error from server")
+            }
+        )
+        // put query into request queue and perform
+        requestQueue.add(createRequest)
+    }
+
+    private fun castRipAffirmVote(currentUser : String){
+        // The associated URL path to Server
+        var urlPath = "$url/placeRipVote"
+
+        val myVote = JSONObject()
+        var list = listOf(currentUser)
+        // Follows format - RIP_TABLE (RIP_ID, RIP_STATEMENT ,RIP_SUBMITTED_BY, RIP_VOTE, MC_ID)
+        // unique ID is pre-generated
+        myVote.put("currentRip", textViewCurrentRipLeft.text)
+        myVote.put("currentUser", list)
+        myVote.put("vote", "True")
+
+        val requestQueue = Volley.newRequestQueue(this)
+        val createRequest = JsonObjectRequest(
+            Request.Method.POST,    // How
+            urlPath,                // Where
+            myVote,           // What
+            Response.Listener { response ->
+                if (response["responseServer"].toString().equals("VotesFor Updated")) {
+                    Toast.makeText(this, "Affirm Vote Cast", Toast.LENGTH_SHORT).show()
+                }
+                if(response["responseServer"].toString().equals("Update Failed")) {
+                    Toast.makeText(this, "Vote Failed", Toast.LENGTH_SHORT).show()
+                }
+            },
+            Response.ErrorListener {
+                println("Error from server")
+            }
+        )
+        // put query into request queue and perform
+        requestQueue.add(createRequest)
+    }
+
+    private fun castMCVote(vote: String, userEmail: String) {
+
+        var urlPathSubmitVote = "$url/voteMC"
+
+        val voteFromStudent = JSONObject()
+        voteFromStudent.put("student",userEmail)
+        voteFromStudent.put("vote", vote)
+
+        val que = Volley.newRequestQueue(this)
+        val req = JsonObjectRequest(
+            Request.Method.POST, urlPathSubmitVote, voteFromStudent,
+            Response.Listener { response ->
+                if(response["responseServer"].toString().equals("Agree") ){
+                    Toast.makeText(this, "Vote has been cast", Toast.LENGTH_LONG).show()
+                }
+                else if(response["responseServer"].toString().equals("Disagree")){
+                    Toast.makeText(this, "Vote has been cast*", Toast.LENGTH_LONG).show()
+                }
+                agree.isEnabled = false
+                disagree.isEnabled = false
+                println("Response from server -> " + response["responseServer"])
+            }, Response.ErrorListener {
+                println("Error from server")
+            }
+        )
+        que.add(req)
     }
 }

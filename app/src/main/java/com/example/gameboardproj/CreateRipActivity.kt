@@ -63,6 +63,7 @@ class CreateRipActivity : AppCompatActivity() {
         // Get UserName from Shared Preferences
         sharedPrefFile = this.getSharedPreferences("sharedPreferences", 0);
         currentUser = sharedPrefFile.getString("Name", "").toString()
+        title_group.text = "Group " + sharedPrefFile.getString("Group Number", "").toString()
 
         // Access text file query Server
         var fileReader: BufferedReader = application.assets.open("url.txt").bufferedReader()
@@ -232,10 +233,14 @@ class CreateRipActivity : AppCompatActivity() {
                 // Display the first 500 characters of the response string.
                 Log.i("Res",response)
                 mainClaim = "$response"
-//                        textView.text = "Response is: ${response.substring(0, 500)}"
+
+                // Set the TextView
+                textViewCreateRipPageMainClaim.text = mainClaim
             },
             Response.ErrorListener { Log.i("res","did not work")})
         queue.add(stringRequest)
+
+
     }
 
     private fun refreshRecycler(array : Array<RiP>){
