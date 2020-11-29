@@ -18,6 +18,8 @@ import org.json.JSONObject
 import java.io.BufferedReader
 
 /**
+ *  @author: Bayron Arturo Palacio
+ *
  *  This Class houses the user's screen upon logging in
  *
  * Currently Used to navigate to RiP Creation
@@ -76,7 +78,8 @@ class UserMain : AppCompatActivity() {
                     Response.ErrorListener { Log.i("res","did not work")})
                 queue.add(stringRequest)
 
-        // Create a RiP
+        // When the user clicks on the RIP button, the app will fetch data from the user account to obtain the group number and
+        //stored in the shared preferences file
         btn_join_group.setOnClickListener{
             var urlGroups = "$url/groupNumber"
 
@@ -106,6 +109,8 @@ class UserMain : AppCompatActivity() {
         }
     }
 
+
+    //Function to cast the vote of the user
     private fun castVote(vote: String, userEmail: String) {
         var urlPathSubmitVote = "$url/voteMC"
 
