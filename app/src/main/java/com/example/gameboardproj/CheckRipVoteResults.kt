@@ -3,6 +3,7 @@ package com.example.gameboardproj
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -18,6 +19,7 @@ import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import kotlinx.android.synthetic.main.activity_check_vote_result.*
+import kotlinx.android.synthetic.main.activity_leader_main.*
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.BufferedReader
@@ -56,6 +58,15 @@ class CheckRipVoteResults : AppCompatActivity() {
         var listOfRips = ArrayList<RiP>()
 
         getRips(url, listOfRips)
+
+        val timer = object: CountDownTimer(500*1000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+               var timeLeft = sharedPrefFile.getString("timeLeft", "").toString()
+                timeLeftInCheckVote.setText(timeLeft)
+            }
+            override fun onFinish() {}
+        }
+        timer.start()
 
         buttonBackToCreateRip.setOnClickListener{
             startActivity(Intent(this, CreateRipActivity::class.java ))

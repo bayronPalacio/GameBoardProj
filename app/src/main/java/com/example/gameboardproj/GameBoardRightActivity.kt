@@ -4,11 +4,13 @@ import android.content.Intent
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.widget.Toast
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import kotlinx.android.synthetic.main.activity_game_board_left.*
 import kotlinx.android.synthetic.main.activity_game_board_right.*
 import kotlinx.android.synthetic.main.activity_user_main.*
 import org.json.JSONObject
@@ -53,6 +55,15 @@ class GameBoardRightActivity : AppCompatActivity() {
         // Access text file query Server
         var fileReader: BufferedReader = application.assets.open("url.txt").bufferedReader()
         var url = fileReader.readLine()
+
+        val timer = object: CountDownTimer(500*1000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                var timeLeft = sharedPrefFile.getString("timeLeft", "").toString()
+                textViewTimerInRIght.setText(timeLeft)
+            }
+            override fun onFinish() {}
+        }
+        timer.start()
 
         buttonGameRightChangeMC.setOnClickListener{
             // Change Main Claim Vote to Agree
