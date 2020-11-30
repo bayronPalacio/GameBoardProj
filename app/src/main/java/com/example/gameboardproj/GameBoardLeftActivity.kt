@@ -58,7 +58,13 @@ class GameBoardLeftActivity : AppCompatActivity() {
         val timer = object: CountDownTimer(500*1000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 var timeLeft = sharedPrefFile.getString("timeLeft", "").toString()
-                textViewTimerInLeft.setText(timeLeft)
+                if(timeLeft.toInt() == 0){
+                    val toEndGame = Intent(applicationContext,EndGameActivity::class.java)
+                    startActivity(toEndGame)
+                }else if(timeLeft.toInt() > 0){
+                    textViewTimerInLeft.setText(timeLeft)
+                }
+
             }
             override fun onFinish() {}
         }

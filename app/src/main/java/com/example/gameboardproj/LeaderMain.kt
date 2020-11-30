@@ -129,6 +129,8 @@ class LeaderMain : AppCompatActivity() {
 
         endScrimmage.setOnClickListener {
             timer.cancel()
+            val toEndGame = Intent(this,EndGameActivity::class.java)
+            startActivity(toEndGame)
         }
 
         checkVote.setOnClickListener{
@@ -175,9 +177,5 @@ class LeaderMain : AppCompatActivity() {
             }
         }
 
-        endScrimmage.setOnClickListener {
-            val toEndGame = Intent(this,EndGameActivity::class.java)
-            startActivity(toEndGame)
-        }
     }
 }
