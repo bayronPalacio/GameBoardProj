@@ -116,7 +116,10 @@ class LeaderMain : AppCompatActivity() {
                 que.add(req)
                 time = (time*1000 - 1000)/1000
             }
-            override fun onFinish() {}
+            override fun onFinish() {
+                val toEndGame = Intent(applicationContext,EndGameActivity::class.java)
+                startActivity(toEndGame)
+            }
         }
 
         startScrimmage.setOnClickListener {
@@ -172,8 +175,8 @@ class LeaderMain : AppCompatActivity() {
             }
         }
 
-        checkResults.setOnClickListener {
-            val toEndGame = Intent(this,CheckRipVoteResults::class.java)
+        endScrimmage.setOnClickListener {
+            val toEndGame = Intent(this,EndGameActivity::class.java)
             startActivity(toEndGame)
         }
     }
