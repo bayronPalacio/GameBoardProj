@@ -25,12 +25,6 @@ import java.io.BufferedReader
  * They can change their MC vote by selecting Change MC Vote
  *
  * They can vote for or against the RIP by pressing the Affirm or Refute buttons
- *
- * TODO
- * pressing back should go can be funky if you've switched sides multiple times
- * Implement Timer?
- * when timer ends go to EndGameActivity
- *
  */
 class GameBoardRightActivity : AppCompatActivity() {
 
@@ -196,8 +190,6 @@ class GameBoardRightActivity : AppCompatActivity() {
                 else if(response["responseServer"].toString().equals("Disagree")){
                     Toast.makeText(this, "Vote has been cast*", Toast.LENGTH_LONG).show()
                 }
-                agree.isEnabled = false
-                disagree.isEnabled = false
                 println("Response from server -> " + response["responseServer"])
             }, Response.ErrorListener {
                 println("Error from server")
