@@ -103,7 +103,7 @@ class UserMain : AppCompatActivity() {
             }
             else{
                 // Move to Rip Creation
-                val toCreateRipScreen = Intent(this, CheckRipVoteResults::class.java)
+                val toCreateRipScreen = Intent(this, CreateRipActivity::class.java)
                 startActivity(toCreateRipScreen)
             }
         }

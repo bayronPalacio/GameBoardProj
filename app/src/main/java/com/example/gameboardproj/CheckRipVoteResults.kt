@@ -18,6 +18,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import com.google.gson.JsonObject
 import kotlinx.android.synthetic.main.activity_check_vote_result.*
 import kotlinx.android.synthetic.main.activity_leader_main.*
 import org.json.JSONArray
@@ -30,11 +31,6 @@ import java.io.BufferedReader
  * Displays the list of RiPs and their votes
  * A holding area while players wait for all votes to be made
  * Once all players have voted they can proceed to the game
- *
- * TODO
- *  Make RecyclerView refresh after Create and Update (have to leave page and return atm)
- *  buttonToGame - needs to check if total number of VOTES is the same as total number of players
- *  get rip with most vvo
  */
 class CheckRipVoteResults : AppCompatActivity() {
 
@@ -53,6 +49,7 @@ class CheckRipVoteResults : AppCompatActivity() {
         var url = fileReader.readLine()
 
         sharedPrefFile = this.getSharedPreferences("sharedPreferences", 0);
+        var editor = sharedPrefFile!!.edit()
         initialMCVote = sharedPrefFile.getString("mcVote", "").toString()
 
         var listOfRips = ArrayList<RiP>()
@@ -78,53 +75,49 @@ class CheckRipVoteResults : AppCompatActivity() {
         }
 
         buttonToGame.setOnClickListener{
-            val editor = sharedPrefFile!!.edit()
-            // count votes
-            var totalVotes = 0
-            var winningRip : RiP
-            for(rip : RiP in listOfRips){
-                totalVotes += rip.ripVote
-                var individualVotes = 0
-                individualVotes = rip.ripVote
-                for(rip : RiP in listOfRips){
-                    if(rip.ripVote > individualVotes)
-                        winningRip = rip
-                }
-            }
-            Log.d("testing", totalVotes.toString())
-            var urlPath = "$url/findWinningRip"
-            var rip : JSONObject
-            val requestQueue = Volley.newRequestQueue(this)
-            val getRequest = JsonObjectRequest(
-                Request.Method.GET,    // How
-                urlPath,                // Where
-                null,           // What
-                Response.Listener { response ->
-                    var rip : String = response["rip_statement"] as String
-                    println(rip.toString())
-                    editor.putString("currentRip", rip)
-                    editor.apply()
-                },
-                Response.ErrorListener {
-                    println("Error from server")
-                }
 
+            var totalVotes = findWinningRip(url, listOfRips, editor)
 
-            )
-            // put query into request queue and perform
-            requestQueue.add(getRequest)
-
-            // check if total votes >= number of players
-            if(totalVotes >= 1) {
-                // Go to game
-                if (initialMCVote.compareTo("Agree") == 0)
-                    startActivity(Intent(this, GameBoardRightActivity::class.java))
-                else
-                    startActivity(Intent(this, GameBoardLeftActivity::class.java))
-            }
-
-            getMCVoteData(url, editor)
+            getMCVoteData(url, totalVotes, editor)
         }
+    }
+
+    private fun findWinningRip(url : String, listOfRips : ArrayList<RiP>, editor : SharedPreferences.Editor): Int {
+        // count votes
+        var totalVotes = 0
+        var winningRip : RiP
+        for(rip : RiP in listOfRips){
+            totalVotes += rip.ripVote
+            var individualVotes = 0
+            individualVotes = rip.ripVote
+            for(rip : RiP in listOfRips){
+                if(rip.ripVote > individualVotes)
+                    winningRip = rip
+            }
+        }
+        Log.d("testing", totalVotes.toString())
+        var urlPath = "$url/findWinningRip"
+        val requestQueue = Volley.newRequestQueue(this)
+        val getRequest = JsonObjectRequest(
+            Request.Method.GET,    // How
+            urlPath,                // Where
+            null,           // What
+            Response.Listener { response ->
+                var rip : String = response["rip_statement"] as String
+                println(rip.toString())
+                editor.putString("currentRip", rip)
+                editor.apply()
+            },
+            Response.ErrorListener {
+                println("Error from server")
+            }
+
+
+        )
+        // put query into request queue and perform
+        requestQueue.add(getRequest)
+
+        return totalVotes
     }
 
     private fun getRips(url: String, listOfRips: ArrayList<RiP>): Array<RiP> {
@@ -173,7 +166,7 @@ class CheckRipVoteResults : AppCompatActivity() {
         return array
     }
 
-    private fun getMCVoteData(url: String, editor :SharedPreferences.Editor){
+    private fun getMCVoteData(url: String, totalVotes : Int, editor : SharedPreferences.Editor){
         var urlPath = "$url/getFinalMCVote"
 
         var listOfVotes: ArrayList<FinalVoteData> = ArrayList<FinalVoteData>()
@@ -228,8 +221,28 @@ class CheckRipVoteResults : AppCompatActivity() {
         )
         // put query into request queue and perform
         requestQueue.add(getRequest)
+
+        var forMCVotes = sharedPrefFile.getString("forList", "").toString()
+        var againstMCVotes = sharedPrefFile.getString("againstList", "").toString()
+
+        var newForList = parseString(forMCVotes)
+        var newAgainstList = parseString(forMCVotes)
+
+        var totalMCVotes = newForList.size + newAgainstList.size
+
+        if(totalVotes >= totalMCVotes) {
+            // Go to game
+            if (initialMCVote.compareTo("Agree") == 0)
+                startActivity(Intent(this, GameBoardRightActivity::class.java))
+            else
+                startActivity(Intent(this, GameBoardLeftActivity::class.java))
+        }
     }
 
+    private fun parseString(list : String) : Array<String>{
+        var newList : Array<String> = list.split("/").toTypedArray()
+        return newList
+    }
 
     class ResultAdapter(private val dataSet: Array<RiP>) :
         RecyclerView.Adapter<ResultAdapter.ViewHolder>() {
@@ -271,7 +284,7 @@ class CheckRipVoteResults : AppCompatActivity() {
         }
     }
 
-    // MC Table follows this Structure... ?
+    // When all RiP votes are cast, game can begin. MC votes for group (Initial) is collected and stored locally.
     data class FinalVoteData constructor(val email : String,
                                          val name : String,
                                          val vote : String)

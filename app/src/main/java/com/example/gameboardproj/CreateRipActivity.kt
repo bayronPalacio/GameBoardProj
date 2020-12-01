@@ -33,13 +33,10 @@ import kotlinx.android.synthetic.main.activity_check_vote_result.*
  * Enter Text into the TextBox then Press Create to Create a RIP
  * All RIPS will be displayed within the RecyclerView
  *
- * Select a RIP in the RecyclerView to have its statement autofill the below textbox
+ * Select a RIP in the RecyclerView to have its statement autofill the textbox
  * Modify the Text and press Update to Modify
  * OR
  * Press Vote to vote for the RIP that was selected
- *
- * TODO
- * Make RecyclerView refresh after Create and Update (have to leave page and return atm)
  */
 
 class CreateRipActivity : AppCompatActivity() {
@@ -52,6 +49,7 @@ class CreateRipActivity : AppCompatActivity() {
     private var currentUser = ""
     private var selectedRip = ""
     private var mainClaim = ""
+    private var array : Array<RiP> = emptyArray()
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var layoutManager: RecyclerView.LayoutManager
@@ -67,6 +65,12 @@ class CreateRipActivity : AppCompatActivity() {
         currentUser = sharedPrefFile.getString("Name", "").toString()
         title_group.text = "Group " + sharedPrefFile.getString("Group Number", "").toString()
 
+        recyclerView = findViewById<RecyclerView>(R.id.ripRecyclerView)
+        layoutManager = LinearLayoutManager(this)
+        adapter = MyAdapter(array) { rip: RiP -> itemClicked(rip) }
+        recyclerView.layoutManager = layoutManager
+        recyclerView.adapter = adapter
+
         // Access text file query Server
         var fileReader: BufferedReader = application.assets.open("url.txt").bufferedReader()
         var url = fileReader.readLine()
@@ -76,7 +80,7 @@ class CreateRipActivity : AppCompatActivity() {
 
         // Create an Array of RiPs, ArrayList used to get data (Size unknown), copied to array
         var listOfRips = ArrayList<RiP>()
-        var array = getRips(url, listOfRips)
+        getRips(url, listOfRips)
         // Test for data
         for(entity in array){
             Log.d("testing", entity.toString())
@@ -126,6 +130,8 @@ class CreateRipActivity : AppCompatActivity() {
                 )
                 // put query into request queue and perform
                 requestQueue.add(createRequest)
+                listOfRips = ArrayList<RiP>()
+                getRips(url, listOfRips)
             } else {
                 Toast.makeText(this, "Please enter your Reason in Play", Toast.LENGTH_LONG).show()
             }
@@ -159,6 +165,8 @@ class CreateRipActivity : AppCompatActivity() {
             )
             // put query into request queue and perform
             requestQueue.add(putRequest)
+            listOfRips = ArrayList<RiP>()
+            getRips(url, listOfRips)
         }
 
         vote_rip.setOnClickListener{
@@ -194,11 +202,10 @@ class CreateRipActivity : AppCompatActivity() {
         }
     }
 
-    private fun getRips(url : String, listOfRips :  ArrayList<RiP>) :  Array<RiP>{
+    private fun getRips(url : String, listOfRips :  ArrayList<RiP>){
 
         // URL Path to return all Rips in DB
         var urlPath = "$url/getAllRips"
-        var array : Array<RiP> = emptyArray()
 
         // Follows format - RIP_TABLE (RIP_ID, RIP_STATEMENT ,RIP_SUBMITTED_BY, RIP_VOTE, MC_ID)
         val requestQueue = Volley.newRequestQueue(this)
@@ -223,7 +230,8 @@ class CreateRipActivity : AppCompatActivity() {
                     listOfRips.add(ripObject)
                 }
                 array = listOfRips.toTypedArray()
-                refreshRecycler(array)
+                adapter = MyAdapter(array) { rip: RiP -> itemClicked(rip) }
+                recyclerView.adapter = adapter
             },
             Response.ErrorListener {
                 println(it.toString())
@@ -231,7 +239,6 @@ class CreateRipActivity : AppCompatActivity() {
         )
         // put query into request queue and perform
         requestQueue.add(getRequest)
-        return array
     }
 
     private fun getMC(url : String) {
@@ -254,14 +261,6 @@ class CreateRipActivity : AppCompatActivity() {
 
     }
 
-    private fun refreshRecycler(array : Array<RiP>){
-        layoutManager = LinearLayoutManager(this)
-        adapter = MyAdapter(array) { rip: RiP -> itemClicked(rip) }
-
-        recyclerView = findViewById<RecyclerView>(R.id.ripRecyclerView)
-        recyclerView.layoutManager = layoutManager
-        recyclerView.adapter = adapter
-    }
 
     private fun itemClicked(rip : RiP) {
         ripInputText.setText(rip.ripStatement)

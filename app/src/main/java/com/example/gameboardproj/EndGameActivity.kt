@@ -61,7 +61,7 @@ class EndGameActivity : AppCompatActivity() {
 
         // End Game - Handle DB? navigate back to UserMain?
         buttonEndGame.setOnClickListener{
-            Toast.makeText(this, "Game Over", Toast.LENGTH_SHORT).show()
+            finishAffinity() // Close entire application
         }
     }
 
