@@ -12,6 +12,7 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import kotlinx.android.synthetic.main.activity_check_vote_result.*
 import kotlinx.android.synthetic.main.activity_game_board_left.*
+import kotlinx.android.synthetic.main.activity_leader_main.*
 import kotlinx.android.synthetic.main.activity_user_main.*
 import org.json.JSONObject
 import java.io.BufferedReader
@@ -50,18 +51,57 @@ class GameBoardLeftActivity : AppCompatActivity() {
         var fileReader: BufferedReader = application.assets.open("url.txt").bufferedReader()
         url = fileReader.readLine()
 
-        val timer = object: CountDownTimer(500*1000, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                var timeLeft = sharedPrefFile.getString("timeLeft", "").toString()
-                if(timeLeft.toInt() == 0){
-                    val toEndGame = Intent(applicationContext,EndGameActivity::class.java)
-                    startActivity(toEndGame)
-                }else if(timeLeft.toInt() > 0){
-                    textViewTimerInLeft.setText(timeLeft)
-                }
+//        var urlTime = "$url/getTime"
+//
+//        val requestTime = JSONObject()
+//        //requestTime.put("time", "0")
+//
+//        var timeLeft = ""
+//        val queTime = Volley.newRequestQueue(this)
+//        val reqTime = JsonObjectRequest(
+//            Request.Method.GET, urlTime, requestTime,
+//            Response.Listener { response ->
+//                timeLeft = response as String
+//                println("Response from server -> $response")
+//            }, Response.ErrorListener {
+//                println("Error from server")
+//            }
+//        )
+//        queTime.add(reqTime)
 
+        var timeLeft = sharedPrefFile.getString("timeLeft", "").toString()
+        val timer = object: CountDownTimer(timeLeft.toLong()*1000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+
+                if(timeLeft.toInt() >= 1){
+                    textViewTimerInLeft.setText(timeLeft)
+
+//                    var urlPath = "$url/setTime"
+//                    val newTime = JSONObject()
+//                    newTime.put("time", timeLeft)
+//                    val que = Volley.newRequestQueue(applicationContext)
+//                    val req = JsonObjectRequest(
+//                        Request.Method.POST, urlPath, newTime,
+//                        Response.Listener { response ->
+//                            if(response["responseServer"].toString().equals("Yes") ){
+//                                Toast.makeText(applicationContext, "Time has been created", Toast.LENGTH_LONG).show()
+//                            }
+//                            else if(response["responseServer"].toString().equals("Updated")){
+//                                //Toast.makeText(applicationContext, "Time has been updated", Toast.LENGTH_LONG).show()
+//                            }
+//                            println("Response from server -> " + response["responseServer"])
+//                        }, Response.ErrorListener {
+//                            println("Error from server")
+//                        }
+//                    )
+//                    que.add(req)
+                }
+                timeLeft = ((timeLeft.toInt()*1000 - 1000)/1000).toString()
             }
-            override fun onFinish() {}
+            override fun onFinish() {
+                val toEndGame = Intent(applicationContext,EndGameActivity::class.java)
+                startActivity(toEndGame)
+            }
         }
         timer.start()
 

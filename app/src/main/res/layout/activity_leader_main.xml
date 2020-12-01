@@ -84,7 +84,7 @@
         app:layout_constraintTop_toBottomOf="@+id/btnCreateGroups" />
 
     <EditText
-        android:id="@+id/timer"
+        android:id="@+id/timerInLearMain"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="108dp"
@@ -110,7 +110,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/timer"
+        app:layout_constraintTop_toBottomOf="@+id/timerInLearMain"
         app:layout_constraintVertical_bias="0.0" />
 
     <TextView

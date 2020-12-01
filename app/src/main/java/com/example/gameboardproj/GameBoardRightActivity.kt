@@ -50,17 +50,20 @@ class GameBoardRightActivity : AppCompatActivity() {
         var fileReader: BufferedReader = application.assets.open("url.txt").bufferedReader()
         var url = fileReader.readLine()
 
-        val timer = object: CountDownTimer(500*1000, 1000) {
+
+        var timeLeft = sharedPrefFile.getString("timeLeft", "").toString()
+        val timer = object: CountDownTimer(timeLeft.toLong()*1000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                var timeLeft = sharedPrefFile.getString("timeLeft", "").toString()
-                if(timeLeft.toInt() == 0){
-                    val toEndGame = Intent(applicationContext,EndGameActivity::class.java)
-                    startActivity(toEndGame)
-                }else if(timeLeft.toInt() > 0){
+
+                if(timeLeft.toInt() >= 1){
                     textViewTimerInRIght.setText(timeLeft)
                 }
+                timeLeft = ((timeLeft.toInt()*1000 - 1000)/1000).toString()
             }
-            override fun onFinish() {}
+            override fun onFinish() {
+                val toEndGame = Intent(applicationContext,EndGameActivity::class.java)
+                startActivity(toEndGame)
+            }
         }
         timer.start()
 

@@ -10,13 +10,7 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-import com.example.gameboardproj.data.MainClaim
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_leader_main.*
-import kotlinx.android.synthetic.main.activity_login.*
-import kotlinx.android.synthetic.main.activity_registration.*
 import org.json.JSONObject
 import java.io.BufferedReader
 
@@ -86,13 +80,13 @@ class LeaderMain : AppCompatActivity() {
         val editor = sharedPrefFile!!.edit()
 
 
-        var time = timer.text.toString().toLong()
+        var time = timerInLearMain.text.toString().toLong()
         var urlPath = "$url/setTime"
 
         val newTime = JSONObject()
         val timer = object: CountDownTimer(time*1000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                timer.setText(time.toString())
+                timerInLearMain.setText(time.toString())
                 newTime.put("time", time)
 
                 editor.putString("timeLeft", time.toString())
@@ -117,12 +111,13 @@ class LeaderMain : AppCompatActivity() {
                 time = (time*1000 - 1000)/1000
             }
             override fun onFinish() {
-                val toEndGame = Intent(applicationContext,EndGameActivity::class.java)
-                startActivity(toEndGame)
+                //val toEndGame = Intent(applicationContext,EndGameActivity::class.java)
+                //startActivity(toEndGame)
             }
         }
 
         startScrimmage.setOnClickListener {
+            time = timerInLearMain.text.toString().toLong()
             timer.start()
 
         }

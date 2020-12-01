@@ -66,7 +66,10 @@ class CheckRipVoteResults : AppCompatActivity() {
                     timeLeftInCheckVote.setText(timeLeft)
                 }
             }
-            override fun onFinish() {}
+            override fun onFinish() {
+                val toEndGame = Intent(applicationContext,EndGameActivity::class.java)
+                startActivity(toEndGame)
+            }
         }
         timer.start()
 
