@@ -61,6 +61,9 @@ class EndGameActivity : AppCompatActivity() {
 
         // End Game - Handle DB? navigate back to UserMain?
         buttonEndGame.setOnClickListener{
+            sharedPrefFile.edit().remove("forList").commit();
+            sharedPrefFile.edit().remove("againstList").commit();
+
             finishAffinity() // Close entire application
         }
     }
@@ -81,24 +84,27 @@ class EndGameActivity : AppCompatActivity() {
     }
 
     private fun initializeFirstVoteRecyclers(){
-        var forString = sharedPrefFile.getString("votesFor", "").toString()
-        var againstString = sharedPrefFile.getString("votesAgainst", "").toString()
+        var forString = sharedPrefFile.getString("forList", "").toString()
+        var againstString = sharedPrefFile.getString("againstList", "").toString()
 
+        Log.d("testing", "a " + forString.toString())
+        Log.d("testing",  "b " + againstString.toString())
         var forArray = parseString(forString)
         var againstArray = parseString(againstString)
-
         var listOfVotes: ArrayList<FinalVoteData> = ArrayList<FinalVoteData>()
         for ( i in forArray){
-            var data = FinalVoteData("", i, "Agree")
+            var data : FinalVoteData = FinalVoteData("", i, "Agree")
             listOfVotes.add(data)
+            Log.d("testing", "Votes for: : " + data.name.toString())
         }
 
         var agreeArray = listOfVotes.toTypedArray()
 
-        listOfVotes.clear()
-        for ( i in forArray){
+        listOfVotes = ArrayList<FinalVoteData>()
+        for ( i in againstArray){
             var data = FinalVoteData("", i, "Disagree")
             listOfVotes.add(data)
+            Log.d("testing", "Votes against: " + data.name.toString())
         }
 
         var disagreeArray = listOfVotes.toTypedArray()
@@ -115,7 +121,7 @@ class EndGameActivity : AppCompatActivity() {
     }
 
     private fun parseString(list : String) : Array<String>{
-        var newList : Array<String> = list.split("/").toTypedArray()
+        var newList : Array<String> = list.trim().split("/").toTypedArray()
         return newList
     }
 
@@ -137,7 +143,7 @@ class EndGameActivity : AppCompatActivity() {
             { response ->
                 for (i in 0 until response.length()) {
                     // now hold a string of the object
-                    Log.d("testing", response[i].toString())
+                    //Log.d("testing", response[i].toString())
 
                     var entity = response[i].toString()
 
@@ -147,8 +153,8 @@ class EndGameActivity : AppCompatActivity() {
                     val name = splitString[3].filterNot { it == '"' }.trim()
                     val vote = splitString[5].filterNot { it == '"' }.dropLast(1).trim()
 
-                    Log.d("testing", email + " " + name + ' ' + vote)
-                    var entry : FinalVoteData = FinalVoteData(email, name, vote)
+                    //Log.d("testing", email + " " + name + ' ' + vote)
+                    var entry : FinalVoteData = FinalVoteData(email, name.trim(), vote)
                     listOfVotes.add(entry)
                 }
 
@@ -158,13 +164,13 @@ class EndGameActivity : AppCompatActivity() {
                     var vote = listOfVotes[i].vote
                     if (vote == "Agree") {
                         agreeVotes.add(listOfVotes[i])
-                        Log.d("testing", "Agree: " + listOfVotes[i].vote.toString())
+                        //Log.d("testing", "Agree: " + agreeVotes[i].name.toString())
                     }
                     if (vote == "Disagree") {
                         refuteVotes.add(listOfVotes[i])
-                        Log.d("testing", "Disagree: " + listOfVotes[i].vote.toString())
+                        //Log.d("testing", "Disagree: " + listOfVotes[i].name.toString())
                     }
-                    Log.d("testing", (listOfVotes[i].vote.compareTo("Agree") == 0).toString())
+                    //Log.d("testing", (listOfVotes[i].vote.compareTo("Agree") == 0).toString())
                 }
 
                 var agreeArray = agreeVotes.toTypedArray()
@@ -197,7 +203,7 @@ class FinalMCVoteAdapter(private var dataSet: Array<FinalVoteData>) :
     inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         fun bindItem(data: FinalVoteData) {
             val textViewName = view.findViewById<TextView>(R.id.ripTextView)
-            textViewName.text = data.name
+            textViewName.text = data.name.toString()
         }
     }
 

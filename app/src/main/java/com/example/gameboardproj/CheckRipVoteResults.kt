@@ -208,10 +208,10 @@ class CheckRipVoteResults : AppCompatActivity() {
                 for (i in 0 until listOfVotes.size) {
                     var vote = listOfVotes[i].vote
                     if (vote == "Agree") {
-                        forList += "$vote/"
+                        forList += listOfVotes[i].name + "/"
                     }
                     if (vote == "Disagree") {
-                        forList += "$AgainstList/"
+                        forList += listOfVotes[i].name + "/"
                     }
                 }
 

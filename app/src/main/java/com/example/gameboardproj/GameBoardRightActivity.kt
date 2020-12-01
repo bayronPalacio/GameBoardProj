@@ -39,7 +39,7 @@ class GameBoardRightActivity : AppCompatActivity() {
         sharedPrefFile = this.getSharedPreferences("sharedPreferences", 0);
         val editor =  sharedPrefFile!!.edit()
         // Get Shared Preferences Data
-        var rip = sharedPrefFile.getString("currentRip", "").toString()
+        var rip = sharedPrefFile.getString("currentRip", "Current RiP").toString()
         var currentUser = sharedPrefFile.getString("Name", "").toString()
         var userEmail = sharedPrefFile.getString("Email", "").toString()
 
