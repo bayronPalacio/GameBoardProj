@@ -1,24 +1,44 @@
 // This is missing lines 1-10 of our python file...
 // didn't want to include our key's etc if its on Git
 
+from flask import Flask, request, render_template
+from pymongo import MongoClient
+import os
+import json
+
+app = Flask(__name__)
+
+app.config.update(dict(SECRET_KEY=''))
+client = MongoClient()
+
 db = client.GameBoardProject
 
 @app.route('/')
 def start():
     return '<h1>GAME BOARD PROJECT</h1>'
 
-@app.route('/team',methods=['GET'])
-def student_name():
-    team = '<h1>Team Members</h1>'
-    team += '<h2>Bayron Arturo Palacio</h2>'
-    return team
 
-@app.route('/data',methods=['GET'])
-def display_data():
-    if os.path.exists('customer.json'):
-        with open('customer.json') as theCustomerFile:
-            data = json.load(theCustomerFile)
-        return render_template('jsonCustomerTable.html', n=len(data), theData=data)
+@app.route('/user',methods=['POST'])
+def add_data():
+
+    fname = "dummyData.json"
+    dataFromUser = request.get_json(force=True)
+    print(dataFromUser,flush = True)
+    if os.path.isfile(fname):
+        with open('dummyData.json','a') as file:
+            file.seek(file.tell()-1, os.SEEK_SET)
+            file.truncate()
+            file.write(',\n')
+            json.dump(dataFromUser,file)
+            file.write(']')
+    else:
+        with open(fname,'w') as file:
+            array = []
+            array.append(dataFromUser)
+            json.dump(array,file)
+    return 'saved'
+
+## User Creation and Validation Queries
 
 @app.route('/adduser',methods=['POST'])
 def add_user():
@@ -52,45 +72,199 @@ def verifyUser():
             responseLogin = {'responseLogin': 'Right User','name':user['Name'],'last':user['Last'],'role':user['Role']}
             responseLoginToJson = json.dumps(responseLogin)
             return responseLoginToJson
+
         else:
             print("Wrong password")
             responseLogin = {'responseLogin': 'Wrong Password'}
             responseLoginToJson = json.dumps(responseLogin)
             return responseLoginToJson
 
-@app.route('/user',methods=['POST'])
-def add_data():
-    fname = "dummyData.json"
-    dataFromUser = request.get_json(force=True)
-    print(dataFromUser,flush = True)
-    if os.path.isfile(fname):
-        with open('dummyData.json','a') as file:
-            file.seek(file.tell()-1, os.SEEK_SET)
-            file.truncate()
-            file.write(',\n')
-            json.dump(dataFromUser,file)
-            file.write(']')
-    else:
-        with open(fname,'w') as file:
-            array = []
-            array.append(dataFromUser)
-            json.dump(array,file)
-    return 'saved'
+
+
+## Main Claim
+
 
 @app.route('/addMC',methods=['POST'])
 def add_mc():
     dataFromMc = request.get_json(force=True)
-    if db.mainclaim.find({'mc': dataFromMc['mc']}).count() <= 0:
+    if db.mainclaim.count() <= 0:
+        #remove previous votes
+        db.voteMC.delete_many({})
         db.mainclaim.insert_one({'mc':dataFromMc['mc']})
         print("Mc has been created")
         response = {'responseServer': 'Yes'}
         responseToJson = json.dumps(response)
         return responseToJson
     else:
-        print("Mc already exists")
-        response = {'responseServer': 'No'}
+        print("Mc will be updated")
+        #remove previous votes
+        db.voteMC.delete_many({})
+        cursor = db.mainclaim.find({})
+        for document in cursor:
+            print(document['_id'])
+            db.mainclaim.update_one(
+                {'_id':document['_id']},
+                {'$set':
+                    {'mc':dataFromMc['mc']}
+
+                })
+        response = {'responseServer': 'Updated'}
         responseToJson = json.dumps(response)
         return responseToJson
+
+
+#Get MC
+@app.route('/getMC',methods=['GET'])
+def get_mc():
+    if db.mainclaim.count() > 0:
+        index = db.mainclaim.find({})
+        for originalMC in index:
+            print(originalMC['mc'])
+            mainClaim = originalMC['mc']
+        return mainClaim
+    else:
+        return "MC has not been found"
+
+#Vote MC and create groups
+@app.route('/voteMC',methods=['POST'])
+def mc_vote():
+    voteFromUser = request.get_json(force=True)
+    if voteFromUser['vote'] == 'Agree':
+        print('agree vote')
+        db.voteMC.insert_one({'user':voteFromUser['student'],'vote':voteFromUser['vote']})
+        response = {'responseServer': 'Agree'}
+        responseToJson = json.dumps(response)
+        return responseToJson
+    elif voteFromUser['vote'] == 'Disagree':
+        print('disagree vote')
+        db.voteMC.insert_one({'user':voteFromUser['student'],'vote':voteFromUser['vote']})
+        response = {'responseServer': 'Disagree'}
+        responseToJson = json.dumps(response)
+        return responseToJson
+    elif voteFromUser['vote'] == 'getTotalVotes':
+        cursor = db.voteMC.find({})
+        agreeVote = 0
+        disagreeVote = 0
+        agreeStudents = []
+        disagreeStudents = []
+        for vote in cursor:
+            if vote['vote'] == 'Agree':
+                agreeVote = agreeVote + 1
+                agreeStudents.append(vote['user'])
+            else:
+                disagreeVote = disagreeVote + 1
+                disagreeStudents.append(vote['user'])
+        totalVotes = agreeVote + disagreeVote
+        print(totalVotes)
+        print(agreeStudents)
+        print(disagreeStudents)
+        studentsGroup = []
+        for index in range(totalVotes):
+            agreeLenght = len(agreeStudents)
+            disagreeLenght = len(disagreeStudents)
+            if (agreeLenght >= 1):
+                studentsGroup.append(agreeStudents.pop())
+            if (disagreeLenght >= 1):
+                studentsGroup.append((disagreeStudents.pop()))
+        print(studentsGroup)
+        print(voteFromUser)
+        members = int(voteFromUser['numberOfMembers'])
+        if(members > 0):
+            print(voteFromUser['numberOfMembers'])
+            groupNumber = 0
+            for count in range(len(studentsGroup)):
+                if(count % members == 0):
+                    groupNumber = groupNumber + 1
+                print(studentsGroup[count] + " belongs to group -> " + str(groupNumber))
+                db.user.update_one(
+                    { "Email" : studentsGroup[count]},
+                    { "$set" : {"groupNumber" : groupNumber }
+                    })
+        response = {'Agree votes': agreeVote,'Disagree votes': disagreeVote}
+        responseToJson = json.dumps(response)
+        return responseToJson
+
+#Get group Number
+@app.route('/groupNumber',methods=['POST'])
+def group():
+    userEmail = request.get_json(force=True)
+    if db.user.find({'Email' : userEmail['Email']}).count() <=0:
+        print("User does not exist")
+        responseGroup = {'responseGroup': 'User does not exist'}
+        responseGroupToJson = json.dumps(responseGroup)
+        return responseGroupToJson
+    else:
+        user = db.user.find_one({'Email' : userEmail['Email']})
+        responseGroup = {'responseGroup': user['groupNumber']}
+        responseGroupToJson = json.dumps(responseGroup)
+        return responseGroupToJson
+
+
+#Get group Number
+@app.route('/getFinalMCVote', methods=['POST'])
+def get_final_mc_vote():
+    ## find current user's group
+    dataFromUser = request.get_json(force=True)
+    cursor = db.user.find({})
+    for x in cursor:
+        if(x['Email'] == dataFromUser[0]):
+            groupNumber = x['groupNumber']
+
+    ## Get all members in group
+    groupMembers = []
+    for member in db.user.find( {"groupNumber": groupNumber}):
+        email = member['Email']
+        name = member['Name'] + " " + member['Last']
+        groupMembers.append({'email' : email, 'name' : name})
+
+    collection = db['voteMC']
+    vote = []
+    for x in groupMembers:
+        for doc in collection.find({'user': x['email']}):
+            vote.append(doc['vote'])
+
+    i = 0
+    while i < len(groupMembers):
+        groupMembers[i].update({'vote' : vote[i]})
+        i += 1
+
+    response = {'responseServer': 'Rip Vote Tallies have been reset'}
+    responseToJson = json.dumps(response)
+    print(groupMembers)
+    return json.dumps(groupMembers)
+
+
+## TIMER
+
+
+@app.route('/setTime',methods=['POST'])
+def set_time():
+    dataFromTime = request.get_json(force=True)
+    if db.time.count() <= 0:
+        db.time.insert_one({'time':dataFromTime['time']})
+        print("Time has been created")
+        response = {'responseServer': 'Yes'}
+        responseToJson = json.dumps(response)
+        return responseToJson
+    else:
+        print("Time will be updated")
+        cursor = db.time.find({})
+        for document in cursor:
+            print(document['_id'])
+            db.time.update_one(
+                {'_id':document['_id']},
+                {'$set':
+                    {'time':dataFromTime['time']}
+
+                })
+        response = {'responseServer': 'Updated'}
+        responseToJson = json.dumps(response)
+        return responseToJson
+
+
+
+## Reason In Play
+
 
 
 ## Create a new RiP
@@ -174,7 +348,7 @@ def select_rip():
         return responseToJson
 
 ## reset all Rip Votes
-@app.route('/resetRipVote', methods=['PUT'])
+@app.route('/resetRipVote', methods=['GET'])
 def reset_rip_votes():
     ## find current user's group
     dataFromUser = request.get_json(force=True)
@@ -317,181 +491,29 @@ def get_rip_second_vote():
     responseToJson = json.dumps(response)
     return json.dumps(response)
 
-//**************NEW ADDMC AND GET MC ****************//
-@app.route('/addMC',methods=['POST'])
-def add_mc():
-    dataFromMc = request.get_json(force=True)
-    if db.mainclaim.count() <= 0:
-        #remove previous votes
-        db.voteMC.delete_many({})
-        db.mainclaim.insert_one({'mc':dataFromMc['mc']})
-        print("Mc has been created")
-        response = {'responseServer': 'Yes'}
-        responseToJson = json.dumps(response)
-        return responseToJson
-    else:
-        print("Mc will be updated")
-        #remove previous votes
-        db.voteMC.delete_many({})
-        cursor = db.mainclaim.find({})
-        for document in cursor:
-            print(document['_id'])
-            db.mainclaim.update_one(
-                {'_id':document['_id']},
-                {'$set':
-                    {'mc':dataFromMc['mc']}
-
-                })
-        response = {'responseServer': 'Updated'}
-        responseToJson = json.dumps(response)
-        return responseToJson
 
 
-#Get MC
-@app.route('/getMC',methods=['GET'])
-def get_mc():
-    if db.mainclaim.count() > 0:
-        index = db.mainclaim.find({})
-        for originalMC in index:
-            print(originalMC['mc'])
-            mainClaim = originalMC['mc']
-        return mainClaim
-    else:
-        return "MC has not been found"
 
-#Vote MC and create groups
-@app.route('/voteMC',methods=['POST'])
-def mc_vote():
-    voteFromUser = request.get_json(force=True)
-    if voteFromUser['vote'] == 'Agree':
-        print('agree vote')
-        db.voteMC.insert_one({'user':voteFromUser['student'],'vote':voteFromUser['vote']})
-        response = {'responseServer': 'Agree'}
-        responseToJson = json.dumps(response)
-        return responseToJson
-    elif voteFromUser['vote'] == 'Disagree':
-        print('disagree vote')
-        db.voteMC.insert_one({'user':voteFromUser['student'],'vote':voteFromUser['vote']})
-        response = {'responseServer': 'Disagree'}
-        responseToJson = json.dumps(response)
-        return responseToJson
-    elif voteFromUser['vote'] == 'getTotalVotes':
-        cursor = db.voteMC.find({})
-        agreeVote = 0
-        disagreeVote = 0
-        agreeStudents = []
-        disagreeStudents = []
-        for vote in cursor:
-            if vote['vote'] == 'Agree':
-                agreeVote = agreeVote + 1
-                agreeStudents.append(vote['user'])
-            else:
-                disagreeVote = disagreeVote + 1
-                disagreeStudents.append(vote['user'])
-        totalVotes = agreeVote + disagreeVote
-        print(totalVotes)
-        print(agreeStudents)
-        print(disagreeStudents)
-        studentsGroup = []
-        for index in range(totalVotes):
-            agreeLenght = len(agreeStudents)
-            disagreeLenght = len(disagreeStudents)
-            if (agreeLenght >= 1):
-                studentsGroup.append(agreeStudents.pop())
-            if (disagreeLenght >= 1):
-                studentsGroup.append((disagreeStudents.pop()))
-        print(studentsGroup)
-        print(voteFromUser)
-        members = int(voteFromUser['numberOfMembers'])
-        if(members > 0):
-            print(voteFromUser['numberOfMembers'])
-            groupNumber = 0
-            for count in range(len(studentsGroup)):
-                if(count % members == 0):
-                    groupNumber = groupNumber + 1
-                print(studentsGroup[count] + " belongs to group -> " + str(groupNumber))
-                db.user.update_one(
-                    { "Email" : studentsGroup[count]},
-                    { "$set" : {"groupNumber" : groupNumber }
-                    })
-        response = {'Agree votes': agreeVote,'Disagree votes': disagreeVote}
-        responseToJson = json.dumps(response)
-        return responseToJson
-
-#Get group Number
-@app.route('/groupNumber',methods=['POST'])
-def group():
-    userEmail = request.get_json(force=True)
-    if db.user.find({'Email' : userEmail['Email']}).count() <=0:
-        print("User does not exist")
-        responseGroup = {'responseGroup': 'User does not exist'}
-        responseGroupToJson = json.dumps(responseGroup)
-        return responseGroupToJson
-    else:
-        user = db.user.find_one({'Email' : userEmail['Email']})
-        responseGroup = {'responseGroup': user['groupNumber']}
-        responseGroupToJson = json.dumps(responseGroup)
-        return responseGroupToJson
-
-@app.route('/setTime',methods=['POST'])
-def set_time():
-    dataFromTime = request.get_json(force=True)
-    if db.time.count() <= 0:
-        db.time.insert_one({'time':dataFromTime['time']})
-        print("Time has been created")
-        response = {'responseServer': 'Yes'}
-        responseToJson = json.dumps(response)
-        return responseToJson
-    else:
-        print("Time will be updated")
-        cursor = db.time.find({})
-        for document in cursor:
-            print(document['_id'])
-            db.time.update_one(
-                {'_id':document['_id']},
-                {'$set':
-                    {'time':dataFromTime['time']}
-
-                })
-        response = {'responseServer': 'Updated'}
-        responseToJson = json.dumps(response)
-        return responseToJson
-
-
-#Get group Number
-@app.route('/getFinalMCVote', methods=['POST'])
-def get_final_mc_vote():
-    ## find current user's group
+@app.route('/getGroupMembers', methods=['POST'])
+def get_group_members():
     dataFromUser = request.get_json(force=True)
-    cursor = db.user.find({})
-    for x in cursor:
-        if(x['Email'] == dataFromUser[0]):
-            groupNumber = x['groupNumber']
 
-    ## Get all members in group
-    groupMembers = []
-    for member in db.user.find( {"groupNumber": groupNumber}):
-        email = member['Email']
-        name = member['Name'] + " " + member['Last']
-        groupMembers.append({'email' : email, 'name' : name})
+    collection = db['user']
+    totalMembers = db.user.find({ 'groupNumber'  : dataFromUser['groupNumber']})
+    return json.dumps(totalMembers)
 
-    collection = db['voteMC']
-    vote = []
-    for x in groupMembers:
-        for doc in collection.find({'user': x['email']}):
-            vote.append(doc['vote'])
-
-    i = 0
-    while i < len(groupMembers):
-        groupMembers[i].update({'vote' : vote[i]})
-        i += 1
-
-    response = {'responseServer': 'Rip Vote Tallies have been reset'}
-    responseToJson = json.dumps(response)
-    print(groupMembers)
-    return json.dumps(groupMembers)
-
-
+@app.route('/getTime', methods=['GET'])
+def get_time():
+    collection = db['time']
+    if db.time.find().count() <= 0:
+        response = {'responseServer': 'No Timer'}
+        responseToJson = json.dumps(response)
+        return responseToJson
+    else:
+        for doc in db.time.find():
+             response = doc['time']
+        responseToJson = json.dumps(response)
+        return json.dumps(response)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',debug=True)
