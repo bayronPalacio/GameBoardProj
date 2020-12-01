@@ -140,7 +140,7 @@ class GameBoardLeftActivity : AppCompatActivity() {
 
         val requestQueue = Volley.newRequestQueue(this)
         val createRequest = JsonObjectRequest(
-            Request.Method.PUT,    // How
+            Request.Method.POST,    // How
             urlPath,                // Where
             user,           // What
             Response.Listener { response ->

@@ -233,6 +233,9 @@ class CheckRipVoteResults : AppCompatActivity() {
 
         var totalMCVotes = newForList.size + newAgainstList.size
 
+        for(i in forMCVotes){
+            Log.d("testing", i.toString())
+        }
         if(totalVotes >= totalMCVotes) {
             // Go to game
             if (initialMCVote.compareTo("Agree") == 0)

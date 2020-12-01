@@ -261,6 +261,19 @@ def set_time():
         responseToJson = json.dumps(response)
         return responseToJson
 
+@app.route('/getTime', methods=['GET'])
+def get_time():
+    collection = db['time']
+    if db.time.find().count() <= 0:
+        response = {'responseServer': 'No Timer'}
+        responseToJson = json.dumps(response)
+        return responseToJson
+    else:
+        for doc in db.time.find():
+             response = doc['time']
+        responseToJson = json.dumps(response)
+        return json.dumps(response)
+
 
 
 ## Reason In Play
@@ -329,7 +342,6 @@ def select_rip():
     if db.rip.find({'rip_statement': dataFromUser['oldStatement']}).count() <= 0:
         response = {'responseServer': 'Could Not Find RiP'}
         responseToJson = json.dumps(response)
-        return responseToJson
     else:
         collection = db['rip'] ## The Collection - RiP Table
         for doc in collection.find():
@@ -345,10 +357,10 @@ def select_rip():
 
         response = {'responseServer': 'Yes'}
         responseToJson = json.dumps(response)
-        return responseToJson
+    return responseToJson
 
 ## reset all Rip Votes
-@app.route('/resetRipVote', methods=['GET'])
+@app.route('/resetRipVote', methods=['POST'])
 def reset_rip_votes():
     ## find current user's group
     dataFromUser = request.get_json(force=True)
@@ -502,18 +514,6 @@ def get_group_members():
     totalMembers = db.user.find({ 'groupNumber'  : dataFromUser['groupNumber']})
     return json.dumps(totalMembers)
 
-@app.route('/getTime', methods=['GET'])
-def get_time():
-    collection = db['time']
-    if db.time.find().count() <= 0:
-        response = {'responseServer': 'No Timer'}
-        responseToJson = json.dumps(response)
-        return responseToJson
-    else:
-        for doc in db.time.find():
-             response = doc['time']
-        responseToJson = json.dumps(response)
-        return json.dumps(response)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',debug=True)
